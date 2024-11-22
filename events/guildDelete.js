@@ -17,12 +17,12 @@ module.exports = {
         if (guildUpdate[0][0] == undefined) {
             await request.query(
                 `INSERT INTO guilds (guildName, guildId, guildIcon, botIn) VALUES (?, ?, ?, ?)`,
-                [guild.name, guild.id, guild.icon, 0]
+                [guild.name, guild.id, guild.icon, 0, guild.memberCount]
             )
         } else {
             await request.query(
                 `UPDATE guilds SET guildName=?, guildIcon=?, botIn=? WHERE guildId=?`,
-                [guild.name, guild.icon, 0, guild.id]
+                [guild.name, guild.icon, 0, guild.memberCount, guild.id]
             )
         }
 

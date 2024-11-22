@@ -62,28 +62,19 @@ module.exports = {
                 },
                 {
                     name: 'Report',
-                    value:
-                        "To report a member or staff on this server, it can be for any reason. If the staff member is a supervisor and above, you will need to go directly into <@291262778730217472> private messages. You'll need to supply the following: \n\n" +
-                        '1. User ID\n' +
-                        '* Reason\n' +
-                        '* Evidence\n'
+                    value: 'To report a member or staff on this server, it can be for any reason. If the staff member is a supervisor and above, you will need to go directly into <@291262778730217472> private messages.'
                 },
                 {
                     name: 'Partnership',
-                    value:
-                        "To become a partner with our server. You'll need to supply the following:\n\n" +
-                        "1. Server Name\n" +
-                        "* Member Count\n" +
-                        "* Server Owner\n" +
-                        "* Server Type\n"
+                    value: "To become a partner with our server",
                 },
                 {
                     name: 'Support',
-                    value: 'To receive support about the meetup, server related feature, etc.\n'
+                    value: 'To receive support about the meetup, server related feature, etc.'
                 },
                 {
                     name: 'Other',
-                    value: 'To receive help or anything else that does not belong in the above categories.\n'
+                    value: 'To receive help or anything else that does not belong in the above categories.'
                 }
             )
             .setColor('Blue')
