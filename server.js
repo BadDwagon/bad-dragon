@@ -222,7 +222,7 @@ bot.on('interactionCreate', async (interaction) => {
       [interaction.guild.id, reason]
     )
 
-    if (ticketFind[0][0] != undefined && ticketFind[0][0]['reason'] === reason) {
+    if (!ticketFind[0][0] == undefined) {
       interaction.reply({
         content: `You already created a ticket for the following reason: \`${reason}\``,
         ephemeral: true,
@@ -491,7 +491,7 @@ bot.on('interactionCreate', async (interaction) => {
           // Send the ticket message in the channel.
           createChannel.send({
             embeds: [inTicketEmbed]
-          });
+          }).then((msg) => msg.pin);
 
           createChannel.send({
             content: `<@${ticketFind[0][0]['userId']}>`,
