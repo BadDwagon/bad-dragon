@@ -490,7 +490,8 @@ bot.on('interactionCreate', async (interaction) => {
 
           // Send the ticket message in the channel.
           createChannel.send({
-            embeds: [inTicketEmbed]
+            embeds: [inTicketEmbed],
+            components: [button]
           }).then((msg) => msg.pin);
 
           createChannel.send({
@@ -498,7 +499,7 @@ bot.on('interactionCreate', async (interaction) => {
           }).then((msg) => {
             setTimeout(() => {
               msg.delete();
-            }, 1000)
+            }, 3000)
           });
         };
 
