@@ -16,7 +16,7 @@ module.exports = {
 
         if (guildFind[0][0] == undefined) {
             await request.query(
-                `INSERT INTO guilds (guildName, guildId, guildIcon, botIn, memberCount) VALUES (?, ?, ?, ?)`,
+                `INSERT INTO guilds (guildName, guildId, guildIcon, botIn, memberCount) VALUES (?, ?, ?, ?, ?)`,
                 [guild.name, guild.id, guild.icon, 1, guild.memberCount]
             )
         } else {
