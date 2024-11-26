@@ -1,8 +1,20 @@
-const { Partials, Client, GatewayIntentBits, EmbedBuilder, Collection, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
+const {
+  Client,
+  Partials,
+  Collection,
+  GatewayIntentBits,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChannelType
+} = require('discord.js');
+const {
+  botPrivateInfo
+} = require('./config/main.json');
 const fs = require('node:fs');
 const path = require('node:path');
 const mysql = require('mysql2/promise');
-const { botPrivateInfo } = require('./config/main.json');
 
 const bot = new Client({
   allowedMentions: { parse: ['users', 'roles'], repliedUser: true },
@@ -17,13 +29,13 @@ const bot = new Client({
     GatewayIntentBits.GuildModeration,
     GatewayIntentBits.GuildMessageReactions,
   ],
-  partials: [Partials.Message, Partials.Channel, Partials.Reaction]
+  partials: [
+    Partials.Message,
+    Partials.Channel,
+    Partials.Reaction
+  ]
 });
-const date = new Date();
-
-const localDate = `${date.toLocaleString()} ->`;
-
-let db = mysql.createPool({
+const db = mysql.createPool({
   host: botPrivateInfo.database.host,
   port: botPrivateInfo.database.port,
   user: botPrivateInfo.database.username,
@@ -33,100 +45,58 @@ let db = mysql.createPool({
   connectionLimit: 100,
 });
 
+const date = new Date();
+const consoleDate = `${date.toLocaleString()} ->`;
+
+//
+// Check if there is any error while loading the database.
 db.on('error', (error) => {
-  console.error(`${localDate} MySQL error`, error);
-})
+  return console.error(`${consoleDate} MySQL error`, error);
+});
 
+//
+// Check if there is any error while closing connection of the database.
 db.on('close', (error) => {
-  console.error(`${localDate} MySQL close`, error);
-})
-
-module.exports = { bot, date, localDate, db };
-
-function loadIntCommand() {
-  let commandsPath = path.join(__dirname, 'commands');
-  let commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-  for (const file of commandsFiles) {
-    let filesPath = path.join(commandsPath, file);
-    let command = require(filesPath);
-    bot.commands.set(command.data.name, command);
-  };
-
-  console.log(`${localDate} All interaction loaded.`)
-};
-
-function loadEvent() {
-  let eventsPath = path.join(__dirname, 'events');
-  let eventsFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-  for (let file of eventsFiles) {
-    let filesPath = path.join(eventsPath, file);
-    let event = require(filesPath);
-    if (event.once) {
-      bot.once(event.name, (...args) => event.execute(...args));
-    } else {
-      bot.on(event.name, (...args) => event.execute(...args));
-    }
-  };
-
-  console.log(`${localDate} All events loaded.`)
-};
+  return console.error(`${consoleDate} MySQL close`, error);
+});
 
 bot.commands = new Collection();
 
-loadIntCommand();
-loadEvent();
+const commandsPath = path.join(__dirname, 'commands');
+const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+for (const file of commandsFiles) {
+  const filesPath = path.join(commandsPath, file);
+  const command = require(filesPath);
+  bot.commands.set(command.data.name, command);
+};
+
+const eventsPath = path.join(__dirname, 'events');
+const eventsFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventsFiles) {
+  const filesPath = path.join(eventsPath, file);
+  const event = require(filesPath);
+  if (event.once) {
+    bot.once(event.name, (...args) => event.execute(...args));
+  } else {
+    bot.on(event.name, (...args) => event.execute(...args));
+  }
+};
 
 bot.on('interactionCreate', async (interaction) => {
   if (!interaction.guild) return;
 
   const request = await db.getConnection();
 
-  function editMessageTicket(ticket, status, color) {
-    const embed = new EmbedBuilder()
-      .setTitle(`Ticket #${ticket[0][0]['ticketId']}`)
-      .addFields(
-        {
-          name: 'Member',
-          value: `<@${ticket[0][0]['userId']}>`,
-          inline: true
-        },
-        {
-          name: 'Staff',
-          value: interaction.user.toString(),
-          inline: true
-        },
-        { name: '\u200b', value: '\u200b', inline: true },
-        {
-          name: 'Reason',
-          value: ticket[0][0]['reason'],
-          inline: true
-        },
-        {
-          name: 'Status',
-          value: status,
-          inline: true
-        },
-        { name: '\u200b', value: '\u200b', inline: true },
-      )
-      .setColor(color)
-
-    interaction.channel.messages.fetch(interaction.message.id).then(() => {
-      interaction.update({
-        embeds: [embed],
-        components: []
-      })
-    });
-  }
-
-  // Action button
+  //
+  // Approving and Denying new action image buttons.
   async function actionButton() {
     const actionFind = await request.query(
       `SELECT * FROM actionimages WHERE messageId=?`,
       [interaction.message.id]
     )
 
-    if (actionFind[0][0] == undefined) return release();
+    if (actionFind[0][0] == undefined) return db.releaseConnection(request);;
 
     userId = actionFind[0][0]['userId'];
     url = actionFind[0][0]['url'];
@@ -185,14 +155,15 @@ bot.on('interactionCreate', async (interaction) => {
     })
   }
 
-  // Ticket button
+  //
+  // Generating ticket button.
   async function ticketButton() {
     const loggingFind = await request.query(
       `SELECT * FROM loggings WHERE guildId=?`,
       [interaction.guild.id]
     )
 
-    if (loggingFind[0][0] == undefined) return release();
+    if (loggingFind[0][0] == undefined) return db.releaseConnection(request);;
 
     switch (interaction.customId) {
       case 'age-verification':
@@ -228,7 +199,7 @@ bot.on('interactionCreate', async (interaction) => {
         ephemeral: true,
       });
 
-      return release();
+      return db.releaseConnection(request);;
     };
 
     interaction.reply({
@@ -310,8 +281,43 @@ bot.on('interactionCreate', async (interaction) => {
     })
   }
 
-  function release() {
-    db.releaseConnection(request);
+  //
+  // Function to edit the -> Ticket Database and Ticket Message
+  function editMessageTicket(ticket, status, color) {
+    const embed = new EmbedBuilder()
+      .setTitle(`Ticket #${ticket[0][0]['ticketId']}`)
+      .addFields(
+        {
+          name: 'Member',
+          value: `<@${ticket[0][0]['userId']}>`,
+          inline: true
+        },
+        {
+          name: 'Staff',
+          value: interaction.user.toString(),
+          inline: true
+        },
+        { name: '\u200b', value: '\u200b', inline: true },
+        {
+          name: 'Reason',
+          value: ticket[0][0]['reason'],
+          inline: true
+        },
+        {
+          name: 'Status',
+          value: status,
+          inline: true
+        },
+        { name: '\u200b', value: '\u200b', inline: true },
+      )
+      .setColor(color)
+
+    interaction.channel.messages.fetch(interaction.message.id).then(() => {
+      interaction.update({
+        embeds: [embed],
+        components: []
+      })
+    });
   }
 
   const action = [
@@ -340,26 +346,35 @@ bot.on('interactionCreate', async (interaction) => {
   if (action.includes(interaction.customId)) return actionButton();
   else if (ticketCreate.includes(interaction.customId)) return ticketButton();
   else if (ticket.includes(interaction.customId)) {
+    //
+    // Get the -> Ticket Database -> ready
     let ticketFind = await request.query(
       `SELECT * FROM ticket WHERE guildId=? AND messageId=?`,
       [interaction.guild.id, interaction.message.id]
-    )
+    );
 
+    //
+    // Get the -> Logging Database -> Ready
     let loggingFind = await request.query(
       `SELECT * FROM loggings WHERE guildId=?`,
       [interaction.guild.id]
-    )
+    );
 
-    // Check if there is data in the logging and ticket database
-    if (ticketFind[0][0] == undefined || loggingFind[0][0] == undefined) return release();
+    //
+    // Check if there is data in the -> Logging and Ticket Database
+    if (ticketFind[0][0] == undefined || loggingFind[0][0] == undefined) return db.releaseConnection(request);;
 
     switch (interaction.customId) {
       case 'ticket_accept':
+        //
+        // Lookup for the server settings.
         const ticketLogFind = await request.query(
           `SELECT * FROM logging_ticket WHERE guildId=?`,
           [interaction.guild.id, interaction.message.id]
         )
 
+        //
+        // Check if the person clicking on the button is -> In the list.
         if (!interaction.member.roles.cache.some(role => role.id === ticketLogFind[0][0]['roleId'])) {
           interaction.reply({
             content: 'You cannot claim ticket.',
@@ -369,17 +384,22 @@ bot.on('interactionCreate', async (interaction) => {
           break;
         }
 
+        //
+        // Check if there's a channel already in -> Ticket Database
+        if (ticketFind[0][0]['channelId'] != undefined) break;
+
+        //
+        // Check if the person clicking on the button is -> Themself.
         if (ticketFind[0][0]['userId'] === interaction.user.id) {
-          interaction.reply({
+          await interaction.reply({
             content: "You cannot claim your own ticket."
           });
 
           break;
-        }
+        };
 
-        if (ticketFind[0][0]['channelId'] != undefined) break;
-
-        // Creating the ticket channel
+        //
+        // Creating the ticket channel.
         const createChannel = await interaction.guild.channels.create({
           name: `${ticketFind[0][0]['reason']}-${ticketFind[0][0]['ticketId']}`,
           type: ChannelType.GuildText,
@@ -400,114 +420,142 @@ bot.on('interactionCreate', async (interaction) => {
           ]
         });
 
-        // On creation of the channel, we send a message.
-        if (createChannel) {
-          await request.query(
-            `UPDATE ticket SET channelId=?, claimedBy=? WHERE userId=? AND guildId=?`,
-            [createChannel.id, interaction.user.id, ticketFind[0][0]['userId'], interaction.guild.id]
-          )
-
-          const inTicketEmbed = new EmbedBuilder()
-            .setTitle(`Ticket #${ticketFind[0][0]['ticketId']}`)
-            .addFields(
-              {
-                name: "Member",
-                value: `<@${ticketFind[0][0]['userId']}>`,
-                inline: true,
-              },
-              {
-                name: "Staff",
-                value: interaction.user.toString(),
-                inline: true,
-              },
-              { name: '\u200b', value: '\u200b', inline: true },
-            )
-            .setColor('Blue');
-
-          const button = new ActionRowBuilder()
-
-          switch (ticketFind[0][0]['reason']) {
-            case "Age Verification":
-              inTicketEmbed.addFields(
-                {
-                  name: "Requirement",
-                  value: "1. Be 18 years or older\n* A valid government ID or driving license"
-                },
-                {
-                  name: "Instructions",
-                  value: "1. Write on a piece of paper your username\n* Place your prefered governmental identification on top of the piece of paper\n* Take a picture and share it to us in this channel"
-                },
-              )
-
-              button.addComponents(
-                new ButtonBuilder()
-                  .setLabel('Verify')
-                  .setCustomId('ticket_verify')
-                  .setStyle(ButtonStyle.Success),
-              )
-
-              break;
-            case "Partnership":
-              inTicketEmbed.addFields(
-                {
-                  name: "Requirement",
-                  value: "1. At least 250 members\n* Furry related"
-                },
-                {
-                  name: "Necessary Information",
-                  value: "1. A server invite code\n* The server member count\n* Is the server NSFW?"
-                },
-              )
-
-              break;
-            case "Report":
-              inTicketEmbed.addFields(
-                {
-                  name: "Necessary Information",
-                  value: "1. Offender ID\n* Offender Username\n* Reason\n* Message Forward/ID"
-                },
-              )
-
-              inTicketEmbed.setColor('Red');
-              break;
-            default:
-              inTicketEmbed.addFields(
-                {
-                  name: "Necessary Information",
-                  value: "Please tell us exactly what do you need help with so we can help you quickly."
-                },
-              )
-
-              break;
-          }
-
-          button.addComponents(
-            new ButtonBuilder()
-              .setLabel('Delete')
-              .setCustomId('ticket_delete')
-              .setStyle(ButtonStyle.Danger),
-          )
-
-          // Send the ticket message in the channel.
-          createChannel.send({
-            embeds: [inTicketEmbed],
-            components: [button]
-          }).then((msg) => msg.pin);
-
-          createChannel.send({
-            content: `<@${ticketFind[0][0]['userId']}>`,
-          }).then((msg) => {
-            setTimeout(() => {
-              msg.delete();
-            }, 3000)
+        //
+        // Check if the channel actually got created.
+        if (!createChannel) {
+          await interaction.reply({
+            content: 'Failed to create a ticket channel.'
           });
+
+          break;
         };
 
+        //
+        // Update the -> Ticket Database
+        await request.query(
+          `UPDATE ticket SET channelId=?, claimedBy=? WHERE userId=? AND guildId=?`,
+          [createChannel.id, interaction.user.id, ticketFind[0][0]['userId'], interaction.guild.id]
+        )
+
+        //
+        // Create the embed.
+        const inTicketEmbed = new EmbedBuilder()
+          .setTitle(`Ticket #${ticketFind[0][0]['ticketId']}`)
+          .addFields(
+            {
+              name: "Member",
+              value: `<@${ticketFind[0][0]['userId']}>`,
+              inline: true,
+            },
+            {
+              name: "Staff",
+              value: interaction.user.toString(),
+              inline: true,
+            },
+            { name: '\u200b', value: '\u200b', inline: true },
+          )
+          .setColor('Blue');
+
+        //
+        // Create the button for the embed.
+        const button = new ActionRowBuilder()
+
+        //
+        // Set specific fields and button for different reason.
+        switch (ticketFind[0][0]['reason']) {
+          case "Age Verification":
+            inTicketEmbed.addFields(
+              {
+                name: "Requirement",
+                value: "1. Be 18 years or older\n* A valid government ID or driving license"
+              },
+              {
+                name: "Instructions",
+                value: "1. Write on a piece of paper your username\n* Place your prefered governmental identification on top of the piece of paper\n* Take a picture and share it to us in this channel"
+              },
+            )
+
+            button.addComponents(
+              new ButtonBuilder()
+                .setLabel('Verify')
+                .setCustomId('ticket_verify')
+                .setStyle(ButtonStyle.Success),
+            )
+
+            break;
+          case "Partnership":
+            inTicketEmbed.addFields(
+              {
+                name: "Requirement",
+                value: "1. At least 250 members\n* Furry related"
+              },
+              {
+                name: "Necessary Information",
+                value: "1. A server invite code\n* The server member count\n* Is the server NSFW?"
+              },
+            )
+
+            break;
+          case "Report":
+            inTicketEmbed.addFields(
+              {
+                name: "Necessary Information",
+                value: "1. Offender ID\n* Offender Username\n* Reason\n* Message Forward/ID"
+              },
+            )
+
+            inTicketEmbed.setColor('Red');
+            break;
+          default:
+            inTicketEmbed.addFields(
+              {
+                name: "Necessary Information",
+                value: "Please tell us exactly what do you need help with so we can help you quickly."
+              },
+            )
+
+            break;
+        }
+
+        //
+        // Create the delete button. It is at the end so it will be the last button.
+        button.addComponents(
+          new ButtonBuilder()
+            .setLabel('Delete')
+            .setCustomId('ticket_delete')
+            .setStyle(ButtonStyle.Danger),
+        )
+
+        //
+        // Send the ticket message in the channel.
+        // Pin the message afterwards.
+        const channelMessage = createChannel.send({
+          embeds: [inTicketEmbed],
+          components: [button]
+        });
+
+        (await channelMessage).pin();
+
+        //
+        // Quickly mention the user that made the ticket.
+        // Delete the message after 1 second.
+        const quickMention = createChannel.send({
+          content: `<@${ticketFind[0][0]['userId']}>`,
+        });
+
+        setTimeout(async () => {
+          (await quickMention).delete();
+        }, 1000)
+
+        //
+        // Update the -> Ticket Database & Ticket Message.
         editMessageTicket(ticketFind, 'Accepted', 'Yellow');
 
         break;
       case 'ticket_decline':
 
+        //
+        // Update the -> Ticket Database & Ticket Message.
         editMessageTicket(ticketFind, 'Declined', 'Red')
 
         break;
@@ -525,7 +573,7 @@ bot.on('interactionCreate', async (interaction) => {
         content: "You cannot delete this ticket. You didn't claim it."
       });
 
-      return release();
+      return db.releaseConnection(request);;
     }
 
     switch (interaction.customId) {
@@ -548,7 +596,13 @@ bot.on('interactionCreate', async (interaction) => {
     }
   }
 
-  release();
+  db.releaseConnection(request);;
 });
 
+//
+// Exporting vital parts of the code.
+module.exports = { bot, date, consoleDate, db };
+
+//
+// Login to discord and the bot.
 bot.login(botPrivateInfo.token);
