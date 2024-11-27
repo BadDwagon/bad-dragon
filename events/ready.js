@@ -1,5 +1,5 @@
 const { Events, ActivityType } = require('discord.js');
-const { db, localDate, bot } = require('../server');
+const { db, consoleDate, bot } = require('../server');
 const configPreset = require('../config/main.json');
 
 module.exports = {
@@ -52,7 +52,7 @@ module.exports = {
             ).catch((error) => { })
         });
 
-        console.log(`${localDate} The bot is ready!`);
+        console.log(`${consoleDate} The bot is ready!`);
 
         return db.releaseConnection(request);
     },

@@ -7,12 +7,14 @@ module.exports = {
     execute: async (leavingMember) => {
         const request = await db.getConnection();
 
+        //
+        //
         const loggingFind = await request.query(
             `SELECT * FROM loggings WHERE guildId=?`,
             [leavingMember.guild.id]
         )
 
-        if (loggingFind[0][0] != undefined) {
+        if (!loggingFind[0][0] == undefined) {
             const channelId_Leaving = loggingFind[0][0]['leaving_channelDestination'];
             if (channelId_Leaving == null) return;
 
@@ -31,6 +33,19 @@ module.exports = {
             }
         }
 
-        db.releaseConnection(request);
+        //
+        //
+        const ticketFind = await request.query(
+            `SELECT * FROM ticket WHERE guildId=? AND userId=?`,
+            [leavingMember.guild.id, leavingMember.user.id]
+        );
+
+        if (!ticketFind[0][0] == undefined) {
+            ticketFind.forEach(a => {
+                console.log(a)
+            });
+        }
+
+        return db.releaseConnection(request);
     }
 };

@@ -49,6 +49,10 @@ const date = new Date();
 const consoleDate = `${date.toLocaleString()} ->`;
 
 //
+// Exporting vital parts of the code.
+module.exports = { bot, date, consoleDate, db };
+
+//
 // Check if there is any error while loading the database.
 db.on('error', (error) => {
   return console.error(`${consoleDate} MySQL error`, error);
@@ -339,7 +343,7 @@ bot.on('interactionCreate', async (interaction) => {
   ]
 
   const inTicket = [
-    'ticket_accept',
+    'ticket_verify',
     'ticket_delete'
   ]
 
@@ -596,12 +600,8 @@ bot.on('interactionCreate', async (interaction) => {
     }
   }
 
-  db.releaseConnection(request);;
+  return db.releaseConnection(request);;
 });
-
-//
-// Exporting vital parts of the code.
-module.exports = { bot, date, consoleDate, db };
 
 //
 // Login to discord and the bot.
