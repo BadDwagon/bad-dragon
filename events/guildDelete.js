@@ -8,36 +8,11 @@ module.exports = {
     execute: async (guild) => {
         const request = await db.getConnection();
 
-        // Update the guild database so the website knows the bot is in the server.
-        const guildUpdate = await request.query(
-            `SELECT * FROM guilds WHERE guildId=?`,
+        // Deleting the guild database of this server.
+        await request.query(
+            `DELETE FROM guilds WHERE guildId=?`,
             [guild.id]
         )
-
-        if (guildUpdate[0][0] == undefined) {
-            await request.query(
-                `INSERT INTO guilds (guildName, guildId, guildIcon, botIn, memberCount) VALUES (?, ?, ?, ?)`,
-                [guild.name, guild.id, guild.icon, 0, guild.memberCount]
-            )
-        } else {
-            await request.query(
-                `UPDATE guilds SET guildName=?, guildIcon=?, memberCount=?, botIn=? WHERE guildId=?`,
-                [guild.name, guild.icon, 0, guild.memberCount, guild.id]
-            )
-        }
-
-        // Find a logging row for the server in the database
-        const loggingFind = await request.query(
-            `SELECT * FROM loggings WHERE guildId=?`,
-            [guild.id]
-        )
-
-        if (loggingFind[0][0] == undefined) {
-            await request.query(
-                `INSERT INTO loggings (guildId) VALUES (?)`,
-                [guild.id]
-            )
-        }
 
         let owner = await guild.fetchOwner();
 

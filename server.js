@@ -316,7 +316,7 @@ bot.on('interactionCreate', async (interaction) => {
       )
       .setColor(color)
 
-    interaction.channel.messages.fetch(interaction.message.id).then(() => {
+    interaction.channel.messages.fetch(ticket[0][0]['messageId']).then(() => {
       interaction.update({
         embeds: [embed],
         components: []

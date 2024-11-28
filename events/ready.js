@@ -44,7 +44,7 @@ module.exports = {
                         [guild.name, guild.icon, 1, guild.memberCount, guild.id]
                     )
                 }
-            })
+            });
 
             await request.query(
                 `INSERT INTO loggings (guildId) VALUES (?)`,
