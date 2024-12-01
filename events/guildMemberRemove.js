@@ -34,16 +34,19 @@ module.exports = {
         }
 
         //
-        //
+        // Delete all tickets.
         const ticketFind = await request.query(
-            `SELECT * FROM ticket WHERE guildId=? AND userId=?`,
-            [leavingMember.guild.id, leavingMember.user.id]
-        );
+            `SELECT * FROM ticket WHERE userId=? AND guildId=?`,
+            [leavingMember.user.id, leavingMember.guild.id]
+        )
 
-        if (!ticketFind[0][0] == undefined) {
-            ticketFind.forEach(a => {
-                console.log(a)
-            });
+        if (!ticketFind == undefined) {
+            console.log(leavingMember.guild.channels.cache.get(leavingMember.guild.id).messages(ticket[0][0]['messageId']))
+
+            await request.query(
+                `DELETE FROM ticket WHERE guildId=? AND userId=?`,
+                [leavingMember.guild.id, leavingMember.user.id]
+            );
         }
 
         return db.releaseConnection(request);
