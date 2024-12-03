@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { joinVoiceChannel, createAudioResource, StreamType, AudioPlayer } = require('@discordjs/voice');
+const { en, fr, de, sp, nl } = require('../../preset/language');
 const tts = require('openai');
-const { fr, en, de, sp, nl } = require('../preset/language');
 
 const player = new AudioPlayer();
 

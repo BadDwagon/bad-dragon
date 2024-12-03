@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { fr, en, de, sp, nl } = require('../preset/language')
-const { db } = require('../server');
+const { en, fr, de, sp, nl } = require('../../preset/language');
+const { db } = require('../../server');
 
 // Display information about a user.
 

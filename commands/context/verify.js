@@ -1,6 +1,6 @@
 const { EmbedBuilder, ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.js');
-const { fr, en, de, sp, nl } = require('../preset/language')
-const { db } = require('../server');
+const { en, fr, de, sp, nl } = require('../../preset/language');
+const { db } = require('../../server');
 
 // This is a private commmand use on a one server only and only executable by me.
 

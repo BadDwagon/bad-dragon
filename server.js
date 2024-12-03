@@ -68,17 +68,25 @@ db.on('close', (error) => {
 bot.commands = new Collection();
 
 const commandsPath = path.join(__dirname, 'commands');
-const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-for (const file of commandsFiles) {
-  const filesPath = path.join(commandsPath, file);
-  const command = require(filesPath);
-  bot.commands.set(command.data.name, command);
-};
+const commandsFilter = fs.readdirSync(commandsPath).filter(file => file != 'message'); // Filter the message event out of it
 
-const eventsPath = path.join(__dirname, 'events');
+for (folder of commandsFilter) {
+  //
+  // Find the folder after the filter
+  const commandsPath = path.join(__dirname, `commands/${folder}`);
+  const commandsFilter = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+  for (file of commandsFilter) {
+    const filesPath = path.join(commandsPath, file);
+    const command = require(filesPath);
+    bot.commands.set(command.data.name, command);
+  }
+}
+
+const eventsPath = path.join(__dirname, 'events/');
 const eventsFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-for (const file of eventsFiles) {
+for (file of eventsFiles) {
   const filesPath = path.join(eventsPath, file);
   const event = require(filesPath);
   if (event.once) {

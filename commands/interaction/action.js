@@ -1,9 +1,9 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { fr, en, de, sp, nl } = require('../preset/language')
-const { bot, db } = require('../server');
-const configPreset = require('../config/main.json');
-const profileInfo = require('../config/profile.json');
+const { en, fr, de, sp, nl } = require('../../preset/language');
+const { bot, db } = require('../../server');
+const configPreset = require('../../config/main');
+const profileInfo = require('../../config/profile');
 
 // Do an action against the bot or another user.
 // Note: There is NSFW related content in there.

@@ -29,6 +29,7 @@ module.exports = {
                 [xpIncrease, message.guild.id, message.author.id]
             )
 
+            //
             // Level up
             if (xpIncrease >= levelFind[0][0]['xpNext']) {
                 const levelCurrent = levelFind[0][0]['level'] + 1;

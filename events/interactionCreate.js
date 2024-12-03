@@ -31,6 +31,7 @@ module.exports = {
             });
         };
 
+        //
         // Execute the command
         try {
             const command = interaction.client.commands.get(interaction.commandName);

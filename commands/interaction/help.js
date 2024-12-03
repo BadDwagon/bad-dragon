@@ -1,7 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { fr, en, de, sp, nl } = require('../preset/language')
-const configPreset = require("../config/main.json");
+const { en, fr, de, sp, nl } = require('../../preset/language');
+const configPreset = require('../../config/main');
 
 // Display a list of command that the bot as.
 
