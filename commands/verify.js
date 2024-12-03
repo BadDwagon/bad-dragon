@@ -19,6 +19,7 @@ module.exports = {
 
         const request = await db.getConnection();
 
+        //
         // Check for the permission of the user executing the command.
         if (!interaction.member.roles.cache.some(role => role.id === '1191482864156557332')) {
             return interaction.reply({
@@ -27,32 +28,39 @@ module.exports = {
             });
         }
 
-        // Check for the roles that the member has.
-        let reason = `User verified by ${interaction.user.tag}.`;
-
+        //
+        // Check if the user is already verified.
         if (interaction.targetMember.roles.cache.some(role => role.id === '1084970943820075050')) {
             return interaction.reply({
                 content: `${interaction.targetMember.toString()} is already verified.`,
                 ephemeral: true,
             });
-        } else if (!interaction.targetMember.roles.cache.some(role => role.id === '1084970943820075050')) {
+        }
+
+        //
+        // Check for the roles that the member has.
+        let reason = `User verified by ${interaction.user.tag}.`
+
+        if (!interaction.targetMember.roles.cache.some(role => role.id === '1084970943820075050')) {
             await interaction.targetMember.roles.add(
                 '1084970943820075050',
                 reason
             )
-        } else if (!interaction.targetMember.roles.cache.some(role => role.id === '1233066501825892383')) {
+        } else if (interaction.targetMember.roles.cache.some(role => role.id === '1233066501825892383')) {
             await interaction.targetMember.roles.remove(
                 '1233066501825892383',
                 reason
             )
         }
 
-        // Replying to the user.
-        interaction.reply({
+        //
+        // Replying to the staff.
+        await interaction.reply({
             content: `Currently trying to verify ${interaction.targetMember.toString()}.`,
             ephemeral: true,
         });
 
+        //
         // Updating the profile.
         const profileFind = await request.query(
             'SELECT userId FROM profiles WHERE userId=?',
@@ -71,6 +79,7 @@ module.exports = {
             )
         }
 
+        //
         // Sending message in channel.
         const verifiedEmbed = new EmbedBuilder()
             .addFields(
@@ -90,6 +99,13 @@ module.exports = {
         await channel18.send({
             content: `${interaction.targetMember.toString()} just got verified! Please make him feel welcomed~`,
             embeds: [verifiedEmbed],
+        });
+
+        //
+        // Modifying the reply to alert the staff it is done.
+        await interaction.deferReply({
+            content: `You successfully verified ${interaction.targetMember.toString()}'s age.`,
+            ephemeral: true,
         });
 
         return db.releaseConnection(request);

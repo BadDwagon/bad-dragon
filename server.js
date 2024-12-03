@@ -7,7 +7,8 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ChannelType
+  ChannelType,
+  PermissionsBitField
 } = require('discord.js');
 const {
   botPrivateInfo
@@ -169,35 +170,32 @@ bot.on('interactionCreate', async (interaction) => {
 
     if (loggingFind[0][0] == undefined) return db.releaseConnection(request);;
 
+    let reason;
+
     switch (interaction.customId) {
       case 'age-verification':
         reason = 'Age Verification';
-
         break;
       case 'report':
         reason = 'Report';
-
         break;
       case 'partnership':
         reason = 'Partnership';
-
         break;
       case 'support':
         reason = 'Support';
-
         break;
       default:
         reason = 'Other';
-
         break;
     }
 
     const ticketFind = await request.query(
-      `SELECT * FROM ticket WHERE guildId=? AND reason=?`,
-      [interaction.guild.id, reason]
+      `SELECT * FROM ticket WHERE guildId=? AND userId=? AND reason=?`,
+      [interaction.guild.id, interaction.user.id, reason]
     )
 
-    if (!ticketFind[0][0] == undefined) {
+    if (ticketFind[0][0] != undefined) {
       interaction.reply({
         content: `You already created a ticket for the following reason: \`${reason}\``,
         ephemeral: true,
@@ -278,7 +276,6 @@ bot.on('interactionCreate', async (interaction) => {
       embeds: [newTicketEmbed],
       components: [newTicketButton]
     }).then(async (msg) => {
-      console.log(msg.id)
       await request.query(
         `INSERT INTO ticket (guildId, userId, ticketId, reason, messageId) VALUES (?, ?, ?, ?, ?)`,
         [interaction.guild.id, interaction.user.id, ticketCount, reason, msg.id]
@@ -414,14 +411,14 @@ bot.on('interactionCreate', async (interaction) => {
 
         //
         // Check if the person clicking on the button is -> Themself.
-        /*if (ticketFind[0][0]['userId'] === interaction.user.id) {
+        if (ticketFind[0][0]['userId'] === interaction.user.id) {
           await interaction.reply({
             content: "You cannot claim your own ticket."
           });
 
           break;
-        };*/
-        console.log(ticketFind)
+        };
+
         //
         // Creating the ticket channel.
         const createChannel = await interaction.guild.channels.create({
@@ -431,15 +428,16 @@ bot.on('interactionCreate', async (interaction) => {
           permissionOverwrites: [
             {
               id: interaction.guild.id,
-              deny: ['ViewChannel'],
+              deny: [PermissionsBitField.Flags.ViewChannel],
             },
             {
               id: interaction.user.id,
-              allow: ['ViewChannel'],
+              allow: [PermissionsBitField.Flags.ViewChannel],
             },
             {
-              id: ticket[0][0]['userId'],
-              allow: ['ViewChannel', 'AttachFiles'],
+              id: ticketFind[0][0]['userId'],
+              type: 1,
+              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.AttachFiles],
             }
           ]
         });
@@ -579,7 +577,7 @@ bot.on('interactionCreate', async (interaction) => {
       case 'ticket_decline':
         //
         // Update the -> Ticket Database & Ticket Message.
-        editMessageTicket(ticketFind, 'Declined', 'Red', 'You **declined** this ticket, it will be deleted in 3 seconds.')
+        editMessageTicket(ticketFind, 'Declined', 'Red', 'You **declined** this ticket.')
 
         await request.query(
           `DELETE FROM ticket WHERE guildId=? AND messageId=?`,
@@ -598,7 +596,7 @@ bot.on('interactionCreate', async (interaction) => {
     if (ticketFind[0][0] == undefined) return db.releaseConnection(request);
 
     // Check who is the person clicking the button
-    if (ticketFind[0][0]['claimedBy'] !== interaction.user.id) {
+    if (ticketFind[0][0]['claimedBy'] !== interaction.user.id || !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
       interaction.reply({
         content: "You cannot delete this ticket. You didn't claim it."
       });
@@ -621,6 +619,60 @@ bot.on('interactionCreate', async (interaction) => {
 
         break;
       case 'ticket_verify':
+        //
+        // Replying to the staff.
+        await interaction.reply({
+          content: `Currently trying to verify ${interaction.targetMember.toString()}.`,
+          ephemeral: true,
+        });
+
+        //
+        // Updating the profile.
+        const profileFind = await request.query(
+          'SELECT userId FROM profiles WHERE userId=?',
+          [interaction.targetId]
+        )
+
+        if (profileFind[0][0] == undefined) {
+          await request.query(
+            'INSERT INTO profiles (userId, userName, verified18) VALUES (?, ?, ?)',
+            [interaction.targetId, interaction.targetMember.username, 1]
+          )
+        } else {
+          await request.query(
+            'UPDATE profiles SET verified18=? WHERE userId=?',
+            [1, interaction.targetId]
+          )
+        }
+
+        //
+        // Sending message in channel.
+        const verifiedEmbed = new EmbedBuilder()
+          .addFields(
+            {
+              name: 'Auto-Role',
+              value:
+                'There is multiple roles you can grab, some are just for fun and some that gives you access to channels :\n' +
+                '* <#1082135082246078464>\n' +
+                '  * This channel will give you access to fun roles that will only be there for yourself. You do not get access to more channels with these roles\n' +
+                '* <#1082135024264032297>\n' +
+                '  * This channel will give you access to NSFW categories. Including yiff and nudes.'
+            }
+          )
+          .setColor('Blue')
+
+        const channel18 = interaction.guild.channels.cache.get('1091220263569461349')
+        await channel18.send({
+          content: `${interaction.targetMember.toString()} just got verified! Please make him feel welcomed~`,
+          embeds: [verifiedEmbed],
+        });
+
+        //
+        // Modifying the reply to alert the staff it is done.
+        await interaction.deferReply({
+          content: `You successfully verified ${interaction.targetMember.toString()}'s age.`,
+          ephemeral: true,
+        });
 
         break;
     }
