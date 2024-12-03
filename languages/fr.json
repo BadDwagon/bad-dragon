@@ -644,8 +644,12 @@
     },
     "level": {
         "default": {
-            "name": "level",
-            "description": "Show your current progress and level."
+            "name": "niveau",
+            "description": "Montrez votre progression et votre niveau actuels.",
+            "user": {
+                "name": "utilisateur",
+                "description": "Obtenir le niveau d'un utilisateur."
+            }
         }
     }
 }

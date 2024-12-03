@@ -646,7 +646,11 @@
     "level": {
         "default": {
             "name": "level",
-            "description": "Show your current progress and level."
+            "description": "Show your current progress and level.",
+            "user": {
+                "name": "user",
+                "description": "User to show the level"
+            }
         }
     }
 }

@@ -39,15 +39,15 @@ module.exports = {
             })
             .setRequired(false)),
     execute: async (interaction) => {
-        let user = interaction.options.getUser(en.staff.default.user.name);
-        let userCheck = user ?
+        const user = interaction.options.getUser(en.staff.default.user.name);
+        const userCheck = user ?
             user :
             interaction.user;
-        let fetchGuild = interaction.client.guilds.cache.get(configPreset.botInfo.supportServerId);
+        const fetchGuild = interaction.client.guilds.cache.get(configPreset.botInfo.supportServerId);
         await fetchGuild.members.fetch();
 
-        let staffGet = fetchGuild.members.cache.get(userCheck.id);
-        let staffRole = staffGet ?
+        const staffGet = fetchGuild.members.cache.get(userCheck.id);
+        const staffRole = staffGet ?
             staffGet.roles.cache.some(role => role.id === configPreset.staffRoleId.leadDeveloper) |
             staffGet.roles.cache.some(role => role.id === configPreset.staffRoleId.developer) |
             staffGet.roles.cache.some(role => role.id === configPreset.staffRoleId.staff) :
