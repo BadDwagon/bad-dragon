@@ -652,5 +652,11 @@
                 "description": "User to show the level"
             }
         }
+    },
+    "leaderboard": {
+        "default": {
+            "name": "leaderboard",
+            "description": "Show the leaderboard of the server."
+        }
     }
 }

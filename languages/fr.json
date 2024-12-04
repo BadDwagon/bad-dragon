@@ -651,5 +651,11 @@
                 "description": "Obtenir le niveau d'un utilisateur."
             }
         }
+    },
+    "leaderboard": {
+        "default": {
+            "name": "leaderboard",
+            "description": "Show the leaderboard of the server."
+        }
     }
 }
