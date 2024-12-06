@@ -39,10 +39,13 @@ module.exports = {
                 `SELECT * FROM level ORDER BY xp DESC LIMIT 9 OFFSET 0`
             )
 
+            let i = 1;
+
             for (leaderboard of levelOrderFind[0]) {
                 embed.addFields(
-                    { name: ` `, value: '<@' + leaderboard['userId'] + '> \n**Level** → `' + leaderboard['level'] + '` \n**XP** → `' + leaderboard['xp'] + '`', inline: true }
+                    { name: `#${i}`, value: '<@' + leaderboard['userId'] + '> \n**Level** → `' + leaderboard['level'] + '` \n**XP** → `' + leaderboard['xp'] + '`', inline: true }
                 );
+                i++;
             };
 
             await interaction.reply({

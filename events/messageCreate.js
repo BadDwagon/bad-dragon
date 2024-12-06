@@ -16,15 +16,34 @@ module.exports = {
             [message.author.id, message.guild.id]
         )
 
+        const userFind = await request.query(
+            'SELECT * FROM users WHERE userId=?',
+            [message.author.id]
+        );
+
+        if (userFind[0][0] == undefined) {
+            await request.query(
+                'INSERT INTO users (`userId`, `userName`, `avatar`, `globalName`) VALUES (?, ?, ?, ?)',
+                [message.author.id, message.author.username, message.author.avatar, message.author.globalName]
+            );
+        } else {
+            await request.query(
+                'UPDATE users SET `userName`=?, `globalName`=?, `avatar`=? WHERE userId=?',
+                [message.author.username, message.author.globalName, message.author.avatar, message.author.id]
+            );
+        }
+
+        const xpPerMessage = 5;
+
         if (levelFind[0][0] == undefined) {
-            await db.query(
+            await request.query(
                 'INSERT INTO level (`guildId`, `userId`, `xp`) VALUES (?, ?, ?)',
-                [message.guild.id, message.author.id, 5]
+                [message.guild.id, message.author.id, xpPerMessage]
             )
         } else {
-            const xpIncrease = levelFind[0][0]['xp'] + 5;
+            const xpIncrease = levelFind[0][0]['xp'] + xpPerMessage;
 
-            await db.query(
+            await request.query(
                 'UPDATE level SET `xp`=? WHERE guildId=? AND userId=?',
                 [xpIncrease, message.guild.id, message.author.id]
             )
@@ -67,12 +86,12 @@ module.exports = {
 
                 const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'leveling.png' });
 
-                await db.query(
+                await request.query(
                     'UPDATE level SET `xpNext`=?, `level`=? WHERE guildId=? AND userId=?',
                     [xpNext, levelCurrent, message.guild.id, message.author.id]
                 )
 
-                const perksFind = await db.query(
+                const perksFind = await request.query(
                     'SELECT * FROM level_perks WHERE guildId=? AND level=?',
                     [message.guild.id, levelCurrent]
                 )

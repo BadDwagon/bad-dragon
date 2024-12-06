@@ -31,7 +31,7 @@ module.exports = {
 
             // Sending the message
             await welcomeChannel.send({
-                content: [`${newMember.user.toString()} joined the server.`]
+                content: `${newMember.user.toString()} joined the server.`
             });
         };
 

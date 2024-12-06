@@ -83,7 +83,7 @@ for (folder of commandsFilter) {
   }
 }
 
-const eventsPath = path.join(__dirname, 'events/');
+const eventsPath = path.join(__dirname, 'events');
 const eventsFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (file of eventsFiles) {
@@ -378,7 +378,7 @@ bot.on('interactionCreate', async (interaction) => {
     if (ticketFind[0][0] == undefined) {
       await interaction.message.delete();
 
-      interaction.reply({
+      await interaction.reply({
         content: 'No data found in the **ticket** database.',
         ephemeral: true,
       });
@@ -396,6 +396,10 @@ bot.on('interactionCreate', async (interaction) => {
     switch (interaction.customId) {
       case 'ticket_accept':
         //
+        // Update the -> Ticket Database & Ticket Message.
+        editMessageTicket(ticketFind, 'Accepted', 'Yellow', 'You **accepted** this ticket, it is currently being created.');
+
+        //
         // Lookup for the server settings.
         const ticketLogFind = await request.query(
           `SELECT * FROM logging_ticket WHERE guildId=?`,
@@ -405,7 +409,7 @@ bot.on('interactionCreate', async (interaction) => {
         //
         // Check if the person clicking on the button is -> In the list.
         if (!interaction.member.roles.cache.some(role => role.id === ticketLogFind[0][0]['roleId'])) {
-          interaction.reply({
+          await interaction.reply({
             content: 'You cannot claim ticket.',
             ephemeral: true,
           });
@@ -463,8 +467,8 @@ bot.on('interactionCreate', async (interaction) => {
         //
         // Update the -> Ticket Database
         await request.query(
-          `UPDATE ticket SET channelId=?, claimedBy=? WHERE userId=? AND guildId=?`,
-          [createChannel.id, interaction.user.id, ticketFind[0][0]['userId'], interaction.guild.id]
+          `UPDATE ticket SET channelId=?, claimedBy=? WHERE messageId=?`,
+          [createChannel.id, interaction.user.id, ticketFind[0][0]['userId'], interaction.message.id]
         )
 
         //
@@ -577,10 +581,6 @@ bot.on('interactionCreate', async (interaction) => {
           (await quickMention).delete();
         }, 1000)
 
-        //
-        // Update the -> Ticket Database & Ticket Message.
-        editMessageTicket(ticketFind, 'Accepted', 'Yellow', 'You **accepted** this ticket, it is currently being created.');
-
         break;
       case 'ticket_decline':
         //
@@ -588,8 +588,8 @@ bot.on('interactionCreate', async (interaction) => {
         editMessageTicket(ticketFind, 'Declined', 'Red', 'You **declined** this ticket.')
 
         await request.query(
-          `DELETE FROM ticket WHERE guildId=? AND messageId=?`,
-          [interaction.guild.id, interaction.message.id]
+          `DELETE FROM ticket WHERE messageId=?`,
+          [interaction.message.id]
         )
 
         break;
@@ -601,12 +601,12 @@ bot.on('interactionCreate', async (interaction) => {
       [interaction.guild.id, interaction.channel.id]
     )
 
-    if (ticketFind[0][0] == undefined) return db.releaseConnection(request);
-
+    //
     // Check who is the person clicking the button
-    if (ticketFind[0][0]['claimedBy'] !== interaction.user.id || !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      interaction.reply({
-        content: "You cannot delete this ticket. You didn't claim it."
+    if (ticketFind[0][0] != undefined && ticketFind[0][0]['claimedBy'] !== interaction.user.id || !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+      await interaction.reply({
+        content: "You cannot delete this ticket. You didn't claim it.",
+        ephemeral: true,
       });
 
       return db.releaseConnection(request);;
@@ -614,11 +614,11 @@ bot.on('interactionCreate', async (interaction) => {
 
     switch (interaction.customId) {
       case 'ticket_delete':
-        setTimeout(async () => {
-          await interaction.channel.delete(`Ticket has been completed by ${interaction.user.toString()}`)
-        }, 3000);
-
         editMessageTicket(ticketFind, 'Completed', 'Green', 'You **completed** this ticket, it will be deleted in 3 seconds.')
+
+        setTimeout(async () => {
+          await interaction.channel.delete()
+        }, 3000);
 
         await request.query(
           `DELETE FROM ticket WHERE guildId=? AND channelId=?`,

@@ -238,7 +238,7 @@ module.exports = {
 
             if (notSend == true) return;
 
-            await db.query('SELECT pronouns FROM profiles WHERE userId=?',
+            await db.query('SELECT pronouns FROM users WHERE userId=?',
                 [userTarget.id])
                 .then((response) => {
                     if (response[0][0] == undefined) {
@@ -266,7 +266,7 @@ module.exports = {
                     };
                 });
 
-            await db.query('SELECT userId, pronouns FROM profiles WHERE userId=?',
+            await db.query('SELECT userId, pronouns FROM users WHERE userId=?',
                 [interaction.user.id])
                 .then((response) => {
                     if (response[0][0] == undefined) {
