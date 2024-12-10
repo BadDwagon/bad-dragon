@@ -1,34 +1,49 @@
 const { Events, EmbedBuilder } = require('discord.js');
+const { db } = require('../server');
+const { botInfo, channelsId } = require('../config/main.json');
 
 module.exports = {
     name: Events.GuildDelete,
     once: false,
     execute: async (guild) => {
-        updateGuildDB(guild, 0);
+        const request = await db.getConnection();
 
-        let removeGuildChannel = fetchguild.client.guilds.cache.get(configPreset.botInfo.supportServerId).guild.channels.cache.get(configPreset.channelsId.botRemoved);
-        if (!removeGuildChannel) return;
+        // Deleting the guild database of this server.
+        await request.query(
+            `DELETE FROM guilds WHERE guildId=?`,
+            [guild.id]
+        )
 
         let owner = await guild.fetchOwner();
 
-        db.query(`SELECT userId FROM blacklists WHERE guildId=?`, [owner.user.id], (error, statement) => {
-            statement ? isBlacklisted = 'Yes' : isBlacklisted = 'No';
-        });
+        // Lookup if the owner of the server is blacklisted
+        const blacklistFind = await request.query(
+            `SELECT * FROM blacklists WHERE userId=?`,
+            [owner.user.id]
+        )
 
-        let removeguildEmbed = new EmbedBuilder()
+        blacklistFind[0][0] == undefined ?
+            isBlacklisted = 'No' :
+            isBlacklisted = 'Yes';
+
+        let removeGuildEmbed = new EmbedBuilder()
             .setTitle('Bot Removed')
             .addFields(
-                { name: 'Server Name', value: guild.name.toString(), inline: true },
-                { name: 'Server ID', value: guild.id.toString(), inline: true },
-                { name: 'Members', value: guild.memberCount.toString(), inline: false },
-                { name: 'Owner Name', value: owner.user.tag.toString(), inline: true },
-                { name: 'Owner ID', value: owner.user.id.toString(), inline: true },
-                { name: 'blacklisted?', value: isBlacklisted.toString(), inline: false },
+                { name: 'Server Name', value: '`' + guild.name + '`', inline: true },
+                { name: 'Server Id', value: '`' + guild.id + '`', inline: true },
+                { name: 'Members', value: '`' + guild.memberCount.toString() + '`', inline: true },
+                { name: '\u200b', value: '\u200b', inline: false },
+                { name: 'Owner Name', value: '`' + owner.user.tag + '`', inline: true },
+                { name: 'Owner Id', value: '`' + owner.user.id + '`', inline: true },
+                { name: 'Blacklisted', value: '`' + isBlacklisted.toString() + '`', inline: true },
             )
             .setColor('Red');
 
-        return removeGuildChannel.send({
-            embeds: [removeguildEmbed]
+        const removeGuildChannel = guild.client.guilds.cache.get(botInfo.supportServerId).channels.cache.get(channelsId.botRemoved)
+        await removeGuildChannel.send({
+            embeds: [removeGuildEmbed]
         });
+
+        return db.releaseConnection(request);
     }
 };

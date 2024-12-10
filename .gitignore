@@ -2,3 +2,4 @@ node_modules
 config
 commands/delisted
 events/delisted
+commands_noslash

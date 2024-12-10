@@ -5,32 +5,72 @@ module.exports = {
     name: Events.GuildMemberRemove,
     once: false,
     execute: async (leavingMember) => {
-        db.query(`SELECT channelId_Leaving FROM blacklists WHERE guildId=?`,
+        const request = await db.getConnection();
+
+        //
+        // Send a message in the leaving channel mentionned.
+        const loggingFind = await request.query(
+            `SELECT * FROM loggings WHERE guildId=?`,
             [leavingMember.guild.id]
         )
-            .then(async (response) => {
-                response = response[0];
 
-                if (!response[0] == undefined) {
+        if (loggingFind[0][0] != undefined) {
+            const channelId_Leaving = loggingFind[0][0]['leaving_channelDestination'];
+            if (channelId_Leaving == null) return;
 
-                    const channelId_Leaving = response['channelId_Leaving'];
-                    if (channelId_Leaving === null) return;
+            const leavingChannel = leavingMember.guild.channels.cache.get(channelId_Leaving);
+            if (!leavingChannel) {
+                await request.query(
+                    `UPDATE loggings SET leaving_channelDestination=?`,
+                    [null]
+                )
+            } else {
+                if (!leavingMember.guild.members.me.permissionsIn(channelId_Leaving).has(['SendMessages', 'ViewChannel']) | leavingMember.user.bot) return;
 
-                    const leavingChannel = leavingMember.guild.channels.cache.get(channelId_Leaving);
+                await leavingChannel.send({
+                    content: `${leavingMember.user.toString()} left the server.`
+                });
+            }
+        }
 
-                    if (!leavingChannel) {
-                        return db.query(`UPDATE loggings SET channelId_Leaving=?`,
-                            [null]
-                        )
-                    } else {
-                        if (!leavingMember.guild.members.me.permissionsIn(channelId_Leaving).has(['SendMessages', 'ViewChannel']) | leavingMember.user.bot) return;
+        //
+        // Delete all tickets.
+        const ticketFind = await request.query(
+            `SELECT * FROM ticket WHERE userId=? AND guildId=?`,
+            [leavingMember.user.id, leavingMember.guild.id]
+        )
 
-                        return leavingChannel.send({
-                            content: [`${leavingMember.user.toString()} left the server.`]
-                        });
-                    }
+        if (ticketFind[0][0] != undefined) {
+            for (i = 0; i <= 10; i++) {
+                //
+                // Delete the message of the ticket.
+                const msg = leavingMember.guild.channels.cache.get(leavingMember.guild.id).messages(ticketFind[0][i]['messageId']);
+                if (msg) msg.delete();
 
-                }
-            });
+                //
+                // Delete the ticket channel if there is one.
+                const channel = leavingMember.guild.channels.cache.get(ticketFind[0][i]['channelId']);
+                if (channel) channel.delete();
+            }
+
+            const ticketCountFind = await request.query(
+                `SELECT * FROM ticket_count WHERE guildId=?`,
+                [leavingMember.guild.id]
+            );
+
+            if (ticketCountFind[0][0] != undefined) {
+                await request.query(
+                    `UPDATE ticket SET count=? WHERE guildId=?`,
+                    [ticketCountFind[0][0]['count'] - 1, leavingMember.guild.id]
+                );
+            }
+
+            await request.query(
+                `DELETE FROM ticket WHERE guildId=? AND userId=?`,
+                [leavingMember.guild.id, leavingMember.user.id]
+            );
+        }
+
+        return db.releaseConnection(request);
     }
 };

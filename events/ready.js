@@ -1,73 +1,60 @@
 const { Events, ActivityType } = require('discord.js');
-const { db, localDate, bot } = require('../server');
+const { db, consoleDate, bot } = require('../server');
 const configPreset = require('../config/main.json');
 
 module.exports = {
     name: Events.ClientReady,
     once: true,
     async execute() {
-        db.getConnection();
-
         bot.user.setStatus('dnd');
 
         let counter = 0;
+        let request = await db.getConnection();
 
         setInterval(async () => {
-            await db.query(`SELECT userId, userTag FROM blacklists`)
-                .then((response) => {
-                    response = response[0];
+            request = await db.getConnection();
 
-                    let status = [
-                        `${bot.guilds.cache.reduce((a, g) => a + g.memberCount, 0)} Members!`,
-                        `${bot.guilds.cache.size} Servers!`,
-                        `${response.length.toString()} Blacklisted Users!`,
-                        `Version ${configPreset.botInfo.version}`,
-                    ];
+            const blacklistFind = await request.query(
+                `SELECT COUNT(*) FROM blacklists`
+            )
 
-                    if (counter == status.length) counter = 0;
-                    bot.user.setActivity(status[counter], { type: ActivityType.Watching });
+            const status = [
+                `${bot.guilds.cache.reduce((a, g) => a + g.memberCount, 0)} Members!`,
+                `${bot.guilds.cache.size} Servers!`,
+                `${blacklistFind[0][0]['COUNT(*)']} Blacklisted Users!`,
+                `Version ${configPreset.botInfo.version}`,
+            ];
 
-                    counter++;
-                });
+            counter == status.length ?
+                counter = 0 :
+                counter++;
+
+            bot.user.setActivity(status[counter], { type: ActivityType.Watching });
+
+            db.releaseConnection(request);
         }, 10000);
 
-        async function updateGuildDB(guild, botIn) {
-            await db.query(`SELECT guildId FROM guilds WHERE guildId=?`,
-                [guild.id])
-                .then(async (response) => {
-                    if (response[0][0] == undefined) {
-                        await db.query(
-                            `INSERT INTO guilds (guildName, guildId, guildIcon, botIn) VALUES (?, ?, ?, ?)`,
-                            [guild.name, guild.id, guild.icon, botIn]
-                        )
-                    } else {
-                        await db.query(
-                            `UPDATE guilds SET guildName=?, guildIcon=?, botIn=? WHERE guildId=?`,
-                            [guild.name, guild.icon, botIn, guild.id]
-                        )
-                    }
-                });
+        bot.guilds.cache.forEach(async (guild) => {
+            await request.query(
+                `INSERT INTO guilds (guildName, guildId, guildIcon, botIn, memberCount) VALUES (?, ?, ?, ?, ?)`,
+                [guild.name, guild.id, guild.icon, 1, guild.memberCount]
+            ).catch(async (error) => {
+                if (error.code === 'ER_DUP_ENTRY') {
+                    await request.query(
+                        `UPDATE guilds SET guildName=?, guildIcon=?, botIn=?, memberCount=? WHERE guildId=?`,
+                        [guild.name, guild.icon, 1, guild.memberCount, guild.id]
+                    )
+                }
+            });
 
-            await db.query(`SELECT guildId FROM loggings WHERE guildId=?`,
-                [guild.id])
-                .then(async (response) => {
-                    if (response[0][0] == undefined) {
-                        await db.query(
-                            `INSERT INTO loggings (guildId) VALUES (?)`,
-                            [guild.id]
-                        )
-                    }
-                });
-        };
-
-        bot.guilds.cache.forEach((guild) => {
-            updateGuildDB(guild, 1);
+            await request.query(
+                `INSERT INTO loggings (guildId) VALUES (?)`,
+                [guild.id]
+            ).catch((error) => { })
         });
 
-        console.log(`${localDate} The bot is ready!`);
+        console.log(`${consoleDate} The bot is ready!`);
 
-        db.releaseConnection();
-
-        return module.exports = { updateGuildDB };
+        return db.releaseConnection(request);
     },
 };

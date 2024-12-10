@@ -1,38 +1,48 @@
 const { Events } = require('discord.js');
 const { en } = require('../preset/language')
-const { bot, db } = require('../server');
+const { db, consoleDate } = require('../server');
 
 module.exports = {
     name: Events.InteractionCreate,
     once: false,
     async execute(interaction) {
-        if (!interaction.isCommand()) return;
+        if (!interaction.guild || !interaction.isCommand()) return;
 
-        const command = bot.commands.get(interaction.commandName);
+        const request = await db.getConnection();
 
-        await db.query(`SELECT name, isOn FROM commandfunctions WHERE name=?`,
-            [interaction.commandName])
-            .then(async (response) => {
-                if (response[0][0] == undefined) {
-                    await db.query(
-                        `INSERT INTO commandfunctions (name, isOn) VALUES (?, ?)`,
-                        [interaction.commandName, 1]
-                    );
-                }
+        const commandFind = await request.query(
+            `SELECT * FROM command_functions WHERE name=?`,
+            [interaction.commandName]
+        )
 
-                response = response[0];
+        if (commandFind[0][0] == undefined) {
+            await request.query(
+                `INSERT INTO command_functions (name, isOn) VALUES (?, ?)`,
+                [interaction.commandName, 1]
+            )
+        }
 
-                if (response['isOn'] == 0 || !interaction.guild) {
-                    !interaction.guild ? refusingAction = en.default.serverOnly : refusingAction = en.default.commandDisabledGlobally;
+        if (commandFind[0]['isOn'] == 0 || !interaction.guild) {
+            !interaction.guild ? refusingAction = en.default.serverOnly : refusingAction = en.default.commandDisabledGlobally;
 
-                    return interaction.reply({
-                        content: refusingAction,
-                        ephemeral: true,
-                    });
-                };
+            return interaction.reply({
+                content: refusingAction,
+                ephemeral: true,
+            });
+        };
 
-                // Execute the command
-                return command.execute(interaction);
-            })
+        //
+        // Execute the command
+        try {
+            const command = interaction.client.commands.get(interaction.commandName);
+            await command.execute(interaction);
+        } catch (error) {
+            console.error(
+                `${consoleDate} ${interaction.user.tag} (${interaction.user.id}) executed ${interaction.commandName}\n\n`,
+                error
+            )
+        }
+
+        return db.releaseConnection(request);
     },
 };

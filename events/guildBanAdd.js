@@ -1,22 +1,26 @@
 const { Events } = require('discord.js');
+const { db } = require('../server');
 
 module.exports = {
     name: Events.GuildBanAdd,
     once: false,
     execute: async (bannedUser) => {
-        await db.query(`SELECT joinedServerBan FROM blacklists WHERE userId=?`,
-            [bannedUser.user.id])
-            .then(async (response) => {
-                response = response[0]
-                if (response[0] == undefined) {
-                    return;
-                } else {
-                    joinedServerBan = response['joinedServerBan'];
+        const request = await db.getConnection()
 
-                    await db.query(`UPDATE blacklists SET joinedServerBan=? WHERE userId=?`,
-                        [joinedServerBan++, bannedUser.user.id]
-                    );
-                }
-            });
+        let blacklistFind = await request.query(
+            'SELECT userId FROM blacklists WHERE userId=?',
+            [bannedUser.user.id]
+        )
+
+        blacklistFind = blacklistFind[0];
+
+        if (blacklistFind[0] != undefined) {
+            await db.query(
+                `UPDATE blacklists SET joinedServerBan=? WHERE userId=?`,
+                [blacklistFind[0]['joinedServerBan']++, bannedUser.user.id]
+            );
+        }
+
+        db.releaseConnection(request);
     }
 };

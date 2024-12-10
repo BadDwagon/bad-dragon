@@ -26,6 +26,6 @@ module.exports = {
                     });
                 }, 7200000);
             };
-        } catch (err) { return }
+        } catch (error) { return }
     }
 };

@@ -1,50 +1,74 @@
-const { Events } = require('discord.js');
+const { Events, EmbedBuilder } = require('discord.js');
 const { db } = require('../server');
-const { updateGuildDB } = require('./ready');
-
-const configPreset = require('../config/main.json');
+const { botInfo, channelsId } = require('../config/main.json');
 
 module.exports = {
     name: Events.GuildCreate,
     once: false,
     execute: async (guild) => {
-        updateGuildDB(guild, 1);
+        const request = await db.getConnection()
 
-        db.query(`SELECT guildId FROM loggings WHERE guildId=?`, [guild.id], (error, statement) => {
-            if (!statement) {
-                db.query(`INSERT INTO loggings (guildId) VALUES (?)`, [guild.id]);
-            };
-        });
+        // Find the guild data in the database
+        const guildFind = await request.query(
+            `SELECT * FROM guilds WHERE guildId=?`,
+            [guild.id]
+        )
 
-        db.query(`SELECT guildId FROM tickets WHERE guildId=?`, [guild.id], (error, statement) => {
-            if (!statement) {
-                db.query(`INSERT INTO tickets (guildId) VALUES (?)`, [guild.id]);
-            };
-        });
+        if (guildFind[0][0] == undefined) {
+            await request.query(
+                `INSERT INTO guilds (guildName, guildId, guildIcon, botIn, memberCount) VALUES (?, ?, ?, ?, ?)`,
+                [guild.name, guild.id, guild.icon, 1, guild.memberCount]
+            )
+        } else {
+            await request.query(
+                `UPDATE guilds SET guildName=?, guildIcon=?, botIn=?, memberCount=? WHERE guildId=?`,
+                [guild.name, guild.icon, 1, guild.memberCount, guild.id]
+            )
+        }
 
-        let guildCreateChannel = guild.client.guilds.cache.get(configPreset.botInfo.supportServerId).channels.cache.get(configPreset.channelsId.botAdded);
-        if (!guildCreateChannel) return;
+        // Find logging data in database
+        const loggingFind = await request.query(
+            `SELECT * FROM loggings WHERE guildId=?`,
+            [guild.id]
+        )
+
+        if (loggingFind[0][0] == undefined) {
+            await request.query(
+                `INSERT INTO loggings (guildId) VALUES (?)`,
+                [guild.id]
+            )
+        }
 
         let owner = await guild.fetchOwner();
 
-        db.query(`SELECT userId FROM blacklists WHERE userId=?`, [owner.user.id], (error, statement) => {
-            statement ? isBlacklisted = 'Yes' : isBlacklisted = 'No';
-        });
+        // Lookup if the owner of the server is blacklisted
+        const blacklistFind = await request.query(
+            `SELECT userId FROM blacklists WHERE userId=?`,
+            [owner.user.id]
+        )
 
-        let newguildEmbed = new EmbedBuilder()
+        blacklistFind[0][0] == undefined ?
+            isBlacklisted = 'No' :
+            isBlacklisted = 'Yes';
+
+        let newGuildEmbed = new EmbedBuilder()
             .setTitle('Bot Added')
             .addFields(
-                { name: 'Server Name', value: guild.name.toString(), inline: true },
-                { name: 'Server ID', value: guild.id.toString(), inline: true },
-                { name: 'Members', value: guild.memberCount.toString(), inline: false },
-                { name: 'Owner Name', value: owner.user.tag.toString(), inline: true },
-                { name: 'Owner ID', value: owner.user.id.toString(), inline: true },
-                { name: 'blacklisted?', value: isBlacklisted.toString(), inline: false },
+                { name: 'Server Name', value: '`' + guild.name + '`', inline: true },
+                { name: 'Server Id', value: '`' + guild.id + '`', inline: true },
+                { name: 'Members', value: '`' + guild.memberCount.toString() + '`', inline: true },
+                { name: '\u200b', value: '\u200b', inline: false },
+                { name: 'Owner Name', value: '`' + owner.user.tag + '`', inline: true },
+                { name: 'Owner Id', value: '`' + owner.user.id + '`', inline: true },
+                { name: 'Blacklisted', value: '`' + isBlacklisted.toString() + '`', inline: true },
             )
             .setColor('Green');
 
-        return guildCreateChannel.send({
-            embeds: [newguildEmbed]
+        const guildCreateChannel = guild.client.guilds.cache.get(botInfo.supportServerId).channels.cache.get(channelsId.botAdded)
+        await guildCreateChannel.send({
+            embeds: [newGuildEmbed]
         });
+
+        return db.releaseConnection(request);
     }
 };
