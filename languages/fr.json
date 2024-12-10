@@ -179,5 +179,34 @@
                 "blacklist": "Blacklist | Auto-Ban"
             }
         }
+    },
+    "repeat": {
+        "default": {
+            "name": "repeter",
+            "description": "Répétez le message souhaité dans le VC dans lequel vous vous trouvez.",
+            "string": {
+                "name": "texte",
+                "description": "Le texte que vous souhaitez que le bot répète pour vous."
+            }
+        },
+        "error": {
+            "wrongGuild": "Vous devez exécuter la commande sur le serveur dans laquelle vous êtes en VC."
+        }
+    },
+    "level": {
+        "default": {
+            "name": "niveau",
+            "description": "Montrez votre progression et votre niveau actuels.",
+            "user": {
+                "name": "utilisateur",
+                "description": "Obtenir le niveau d'un utilisateur."
+            }
+        }
+    },
+    "leaderboard": {
+        "default": {
+            "name": "leaderboard",
+            "description": "Show the leaderboard of the server."
+        }
     }
 }

@@ -567,7 +567,6 @@ bot.on('interactionCreate', async (interaction) => {
             .setDisabled(true)
         )
 
-
         //
         // Send the ticket message in the channel.
         // Pin the message afterwards.
@@ -622,7 +621,6 @@ bot.on('interactionCreate', async (interaction) => {
 
     switch (interaction.customId) {
       case 'ticket_delete':
-        console.log(ticketFind)
         if (ticketFind[0][0] != undefined) await editMessageTicket(ticketFind, 'Completed', 'Green', 'You **completed** this ticket, it will be deleted in 3 seconds.')
 
         await request.query(

@@ -179,5 +179,34 @@
                 "blacklist": "Blacklist | Auto-Ban"
             }
         }
+    },
+    "repeat": {
+        "default": {
+            "name": "repeat",
+            "description": "Repeat the message you wish in the VC you are in.",
+            "string": {
+                "name": "text",
+                "description": "The text you wish the bot to repeat for you."
+            }
+        },
+        "error": {
+            "wrongGuild": "You must run the command on the guild you are a VC in."
+        }
+    },
+    "level": {
+        "default": {
+            "name": "level",
+            "description": "Show your current progress and level.",
+            "user": {
+                "name": "user",
+                "description": "User to show the level"
+            }
+        }
+    },
+    "leaderboard": {
+        "default": {
+            "name": "leaderboard",
+            "description": "Show the leaderboard of the server."
+        }
     }
 }
