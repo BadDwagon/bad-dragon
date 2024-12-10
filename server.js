@@ -336,7 +336,7 @@ bot.on('interactionCreate', async (interaction) => {
       })
       .catch(() => { });
 
-    interaction.reply({
+    await interaction.reply({
       content: replyStaff,
       ephemeral: true
     });
@@ -557,7 +557,14 @@ bot.on('interactionCreate', async (interaction) => {
           new ButtonBuilder()
             .setLabel('Delete')
             .setCustomId('ticket_delete')
-            .setStyle(ButtonStyle.Danger),
+            .setStyle(ButtonStyle.Danger)
+        )
+        button.addComponents(
+          new ButtonBuilder()
+            .setLabel('Buttons → Staff Only')
+            .setCustomId('ticket_warning')
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(true)
         )
 
         //
@@ -614,42 +621,42 @@ bot.on('interactionCreate', async (interaction) => {
 
     switch (interaction.customId) {
       case 'ticket_delete':
-        editMessageTicket(ticketFind, 'Completed', 'Green', 'You **completed** this ticket, it will be deleted in 3 seconds.')
-
-        setTimeout(async () => {
-          await interaction.channel.delete()
-        }, 3000);
+        if (ticketFind[0][0] != undefined) await editMessageTicket(ticketFind, 'Completed', 'Green', 'You **completed** this ticket, it will be deleted in 3 seconds.')
 
         await request.query(
           `DELETE FROM ticket WHERE guildId=? AND channelId=?`,
           [interaction.guild.id, interaction.channel.id]
         )
 
+        setTimeout(async () => {
+          await interaction.channel.delete();
+        }, 3000);
+
         break;
       case 'ticket_verify':
         //
         // Replying to the staff.
         await interaction.reply({
-          content: `Currently trying to verify ${interaction.targetMember.toString()}.`,
+          content: `Currently trying to verify <@${ticketFind[0][0]['userId']}>.`,
           ephemeral: true,
         });
 
         //
         // Updating the profile.
-        const profileFind = await request.query(
-          'SELECT userId FROM profiles WHERE userId=?',
+        const userFind = await request.query(
+          'SELECT userId FROM users WHERE userId=?',
           [interaction.targetId]
         )
 
-        if (profileFind[0][0] == undefined) {
+        if (userFind[0][0] == undefined) {
           await request.query(
-            'INSERT INTO profiles (userId, userName, verified18) VALUES (?, ?, ?)',
-            [interaction.targetId, interaction.targetMember.username, 1]
+            'INSERT INTO users (userId, ageVerified) VALUES (?, ?)',
+            [ticketFind[0][0]['userId'], 1]
           )
         } else {
           await request.query(
-            'UPDATE profiles SET verified18=? WHERE userId=?',
-            [1, interaction.targetId]
+            'UPDATE users SET ageVerified=? WHERE userId=?',
+            [1, ticketFind[0][0]['userId']]
           )
         }
 
@@ -671,14 +678,14 @@ bot.on('interactionCreate', async (interaction) => {
 
         const channel18 = interaction.guild.channels.cache.get('1091220263569461349')
         await channel18.send({
-          content: `${interaction.targetMember.toString()} just got verified! Please make him feel welcomed~`,
+          content: `${ticketFind[0][0]['userId']} just got verified! Please make him feel welcomed~`,
           embeds: [verifiedEmbed],
         });
 
         //
         // Modifying the reply to alert the staff it is done.
         await interaction.deferReply({
-          content: `You successfully verified ${interaction.targetMember.toString()}'s age.`,
+          content: `You successfully verified <@${ticketFind[0][0]['userId']}>'s age.`,
           ephemeral: true,
         });
 

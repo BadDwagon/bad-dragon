@@ -1,631 +1,182 @@
 {
-    "default": {
-        "errorOccured": "Une erreur s'est produite. Veuillez contacter @baddwagon ou il vous contactera bientôt si cela est pertinent.",
-        "unknownUser": "Une erreur s'est produite. Je ne trouve pas cet utilisateur.",
-        "commandDisabledGlobally": "Une erreur s'est produite. Cette commande est désactivée globalement par les développeurs.",
-        "serverOnly": "Une erreur s'est produite. Vous ne pouvez utiliser cette commande que sur un serveur.",
-        "staffOnly": "Une erreur s'est produite. Cette commande n'est disponible que pour le personnel de Cheryl.",
-        "userPermission": {
-            "ban": "Il vous manque cette autorisation: Bannir des membres.",
-            "kick": "Il vous manque cette autorisation: Expulser des membres.",
-            "manageRoles": "Il vous manque cette autorisation: Gérer les rôles.",
-            "manageMessages": "Il vous manque cette autorisation: Gérer les messages.",
-            "manageChannels": "Il vous manque cette autorisation: Gérer les salons."
-        },
-        "botPermission": {
-            "ban": "Il me manque cette autorisation: Bannir des membres.",
-            "kick": "Il me manque cette autorisation: Expulser des membres.",
-            "manageRoles": "Il me manque cette autorisation: Gérer les rôles.",
-            "manageMessages": "Il me manque cette autorisation: Gérer les messages.",
-            "manageChannels": "Il me manque cette autorisation: Gérer les salons."
-        },
+    "global": {
+        "commandDisabledGlobally": " This command is disabled globally by the developers.",
+        "serverOnly": "You can only use this command in a server.",
+        "staffOnly": "This command is only available to the staff of Cheryl.",
+        "userMissingPermission": "You are missing the following permission: `%Arg%`",
+        "userMissingRole": "You are missing the following role: %Arg%",
+        "botMissingPermission": "I'm missing the following permission: `%Arg%`",
+        "botMissingRole": "I am missing the following role: %Arg%",
         "button": {
-            "discord": "Serveur d'assistance"
+            "discord": "Support Server"
         }
     },
-    "bump": {
-        "message": {
-            "thanks_first": "Merci d'avoir bump le serveur! Je rappellerai",
-            "thanks_second": "dans 2 heures pour le bump à nouveau.",
-            "embed": {
-                "title": "Bump Time",
-                "description": "Cela fait déjà 2 heures et il est désormais temps de bump le serveur !\n* Utilisez la commande `/bump` de Disboard."
-            }
-        }
-    },
-    "help": {
-        "default": {
-            "name": "aide",
-            "description": "Afficher les commandes disponibles (ou des informations sur une certaine commande).",
-            "info": {
-                "name": "info",
-                "description": "Afficher des informations sur certaines commandes/fonctionnalités."
-            }
-        }
-    },
-    "language": {
-        "default": {
-            "name": "langue",
-            "description": "Changer la langue du bot sur le serveur."
-        }
-    },
-    "serverinfo": {
-        "default": {
-            "name": "serveurinfo",
-            "description": "Afficher les informations sur le serveur."
-        }
-    },
-    "profile": {
-        "default": {
-            "name": "profil",
-            "description": "Obtenir des informations sur un utilisateur.",
-            "user": {
-                "name": "utilisateur",
-                "description": "Utilisateur auprès duquel obtenir des informations."
-            },
-            "choice": {
-                "age": {
-                    "name": "âge",
-                    "description": "Changez votre âge.",
-                    "list": {
-                        "minor": "Mineure",
-                        "adult": "Adulte"
-                    }
-                },
-                "pronouns": {
-                    "name": "pronom",
-                    "description": "Change votre pronom.",
-                    "list": {
-                        "they": "???",
-                        "them": "eux",
-                        "their": "leur",
-                        "she": "elle",
-                        "her": "son",
-                        "he": "il",
-                        "him": "lui",
-                        "his": "son"
-                    }
-                },
-                "gender": {
-                    "name": "genre",
-                    "description": "Changez votre sexe."
-                },
-                "message": {
-                    "option": {
-                        "embed": {
-                            "description": "Profil mis à jour",
-                            "name": "Nom",
-                            "id": "Identifiant",
-                            "age": "Âge",
-                            "verified18": "Vérifié 18+",
-                            "verifier": "Vérificateur",
-                            "createdAt": "Compte créé le",
-                            "joinedAt": "Rejoint Discord le",
-                            "roles": "Rôle(s)",
-                            "noDataFound": "Aucune donnée disponible"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "staff": {
-        "default": {
-            "name": "personnel",
-            "description": "Vérifier si un utilisateur fait partie du personnel du bot.",
-            "user": {
-                "name": "utilisateur",
-                "description": "Utilisateur à vérifier."
-            }
-        }
-    },
-    "welcomeMessage": {
-        "message": {
-            "default": "joined the server.",
-            "blacklist": {
-                "autoBan": "Liste noire | Bannissement automatique"
-            }
-        }
-    },
-    "welcomeMenu": {
-        "default": {
-            "name": "verification",
-            "description": "Envoyer le message de vérification dans le salon."
-        }
-    },
-    "leavingMessage": {
-        "message": {
-            "embed": {
-                "logs": {
-                    "description": "Au revoir",
-                    "fields": {
-                        "createdAt": "Compte créé le",
-                        "joinedAt": "Rejoint Discord le",
-                        "memberCount": "Nombre de membres",
-                        "statusVerification": "Vérification du statut"
-                    },
-                    "verificationEnable": {
-                        "isVerified": "Était vérifié",
-                        "isNotVerified": "N'était pas vérifié"
-                    }
-                }
-            }
-        }
-    },
-    "verification": {
-        "default": {
-            "button": {
-                "verification": {
-                    "alreadyVerified": "Une erreur est produite. Vous êtes déjà vérifié.",
-                    "waiting": "Vous avez déjà envoyé une vérification sur ce serveur. Vous recevrez sous peu un message/mention sur l'état de votre vérification.",
-                    "received": "Vous avez envoyé avec succès votre vérification. Vous recevrez sous peu un message/mention sur l'état de votre vérification.",
-                    "accept": "Accepter",
-                    "deny": "Refuser",
-                    "modal": {
-                        "title": "Vérification",
-                        "firstOption": {
-                            "label": "Quel âge avez-vous?",
-                            "placeholder": "Écrivez votre âge.."
-                        },
-                        "secondOption": {
-                            "label": "Comment avez-vous trouvé notre serveur?",
-                            "placeholder": "Écrivez le nom du site Web/de l'ami sur lequel vous avez obtenu le serveur.."
-                        },
-                        "thirdOption": {
-                            "label": "Pourquoi nous rejoignez-vous?",
-                            "placeholder": "Écrivez la raison pour laquelle vous rejoignez le serveur.."
-                        },
-                        "fourthOption": {
-                            "label": "Que pensez-vous de la communauté furry?",
-                            "placeholder": "Écrivez votre opinion sur le fandom furry dans un court paragraphe.."
-                        },
-                        "fifthOption": {
-                            "label": "As-tu un sona?",
-                            "placeholder": "Écrivez une description courte mais détaillée de votre sona.."
-                        }
-                    }
-                },
-                "waiting": {
-                    "default": "Vérification de",
-                    "cancelled": "annulé",
-                    "accepted": "accepté par",
-                    "denied": "nié par"
-                },
-                "accept": {
-                    "roleAdd": "Système de vérification: Vérifié par",
-                    "welcomeMessage": "Bienvenue",
-                    "guildWelcomeMessage": "à"
-                },
-                "deny": {
-                    "reason": "Votre vérification a été refusée.\n\nRaison:"
-                }
-            }
-        }
-    },
-    "verify": {
-        "default": {
-            "name": "Vérifier",
-            "description": "Vérifier manuellement un membre."
-        }
-    },
-    "action": {
-        "default": {
-            "name": "action",
-            "description": "Faire une action (ou suggérer une image pour une action) sur un membre.",
-            "choice": {
-                "name": "choix",
-                "description": "Quelle action souhaiteriez-vous faire ?"
-            },
-            "suggest": {
-                "name": "suggérer",
-                "description": "Proposer une image à ajouter au choix sélectionné."
-            },
-            "member": {
-                "name": "membre",
-                "description": "Membre à cibler."
-            }
-        },
-        "message": {
-            "error": {
-                "wrongUrl": "URL invalide. Vous devez fournir une URL valide.",
-                "wrongFormat": "Vous devez envoyer un format valide. L'URL doit se terminer par `.jpg`, `.gif` or `.png`.",
-                "alreadyExist": "Cette image a déjà été suggérée/ajoutée.",
-                "disable": "Cette commande a été désactivée sur ce serveur.",
-                "notNsfw": "Vous ne pouvez pas utiliser la commande NSFW dans ce canal. Cette chaîne doit être soumise à une limite d'âge pour utiliser cette commande."
-            },
-            "success": {
-                "suggested": "Votre image a été envoyée avec succès au personnel de"
-            }
-        }
-    },
-    "avatar": {
-        "default": {
-            "name": "avatar",
-            "description": "Obtenir l'avatar d'un utilisateur.",
-            "user": {
-                "name": "utilisateur",
-                "description": "Utilisateur pour obtenir l'avatar."
-            }
-        },
-        "message": {
-            "embed": {
-                "title": "Avatar of"
-            }
-        }
-    },
-    "ban": {
-        "default": {
-            "name": "ban",
-            "description": "Bannir un utilisateur",
-            "user": {
-                "name": "user",
-                "description": "Utilisateur à bannir."
-            },
-            "reason": {
-                "name": "reason",
-                "description": "Raison du bannissement"
-            }
-        },
-        "message": {
-            "success": "a été banni",
-            "embed": {
-                "log": {
-                    "title": "Nouveau Bannissement",
-                    "fields": {
-                        "member": "Membre",
-                        "reason": "Raison",
-                        "mod": "Modérateur"
-                    }
-                }
-            },
-            "dm": {
-                "you": "Vous avez été banni sur",
-                "for": "pour",
-                "by": "par"
-            },
-            "onWho": {
-                "isThemself": "Une erreur s'est produite. You can't ban yourself.",
-                "isBot": "Une erreur s'est produite. You can't ban me.",
-                "isOwner": "Une erreur s'est produite. You can't ban the owner.",
-                "isPunishable": "Une erreur s'est produite. I can't ban this user.",
-                "isHigher": "Une erreur s'est produite. You can't ban this user, because they're higher than you.",
-                "isAlready": "Une erreur s'est produite. You can't ban this user, since they are already banned."
-            }
-        }
-    },
-    "unban": {
-        "default": {
-            "name": "unban",
-            "description": "Unban a user",
-            "user": {
-                "name": "user",
-                "description": "User to unban"
-            }
-        },
-        "message": {
-            "success": "has been unban from the server",
-            "embed": {
-                "log": {
-                    "new": "New Unban",
-                    "user": "User",
-                    "mod": "Moderator"
-                }
-            }
-        }
-    },
-    "kick": {
-        "default": {
-            "name": "kick",
-            "description": "Kick a user",
-            "user": {
-                "name": "user",
-                "description": "User to kick"
-            },
-            "reason": {
-                "name": "reason",
-                "description": "Reason of the kick"
-            }
-        },
-        "message": {
-            "success": "has been kicked from the server for",
-            "embed": {
-                "log": {
-                    "new": "New Kick",
-                    "user": "User",
-                    "reason": "Reason",
-                    "mod": "Moderator"
-                }
-            },
-            "dm": {
-                "you": "You have been kicked on",
-                "for": "for",
-                "by": "by"
-            },
-            "onWho": {
-                "myself": "Une erreur s'est produite. You can't kick yourself",
-                "bot": "Une erreur s'est produite. You can't kick me",
-                "owner": "Une erreur s'est produite. You can't kick the owner",
-                "punishable": "Une erreur s'est produite. I can't kick this user",
-                "role": "Une erreur s'est produite. You can't kick this user, because they're higher than you"
-            }
-        }
-    },
-    "warn": {
-        "default": {
-            "name": "warn",
-            "description": "Warn a member"
-        }
-    },
-    "warns": {
-        "default": {
-            "name": "warns",
-            "description": "Show your warn(s) or the warn(s) of another member"
-        }
-    },
-    "lock": {
-        "default": {
-            "name": "lock",
-            "description": "Lock the channel"
-        },
-        "message": {
-            "success": "The channel has been successfully locked"
-        },
-        "permission": {
-            "myself": ":warning: Insufficient Permission - You need the following permission: *Manage Messages*",
-            "me": ":warning: Insufficient Permission - I need the following permission: *Manage Messages*"
-        }
-    },
-    "unlock": {
-        "default": {
-            "name": "unlock",
-            "description": "Unlock the channel"
-        },
-        "message": {
-            "success": "The channel has been successfully unlocked"
-        }
-    },
-    "blacklist": {
-        "default": {
-            "name": "blacklist",
-            "description": "Blacklist System - Protect your server against bad user",
-            "add": {
-                "name": "add",
-                "description": "Add a user to the blacklist",
-                "user": {
-                    "name": "user",
-                    "description": "User to blacklist"
-                },
-                "reason": {
-                    "name": "reason",
-                    "description": "Reason for adding the user to the blacklist",
-                    "list": {
-                        "account-self-bot": "Account - Self-bot",
-                        "scam-selling-art": "Scamming - Selling art",
-                        "scam-sugar": "Scamming - Sugar daddy, babby, mommy, etc.",
-                        "lawbreaking-soliciting-underage": "Law Breaking - Soliciting underage user to participate to sexual activities",
-                        "lawbreaking-partipating-underage": "Law Breaking - Participating to sexual activities while being underage",
-                        "content-sharing-gore": "Content - Sharing hardcore gore, excessive violence or/and animal harm",
-                        "content-sharing-cheats": "Content - Sharing or/and selling game cheats",
-                        "content-hate-speech": "Content - Hate speech",
-                        "content-self-harm": "Content - Promoting, glorifing or/and normalizing self-harm or suicide"
-                    }
-                },
-                "risk": {
-                    "name": "risk",
-                    "description": "Risk of the user to them being in a server",
-                    "list": {
-                        "low": "Low",
-                        "medium": "Medium",
-                        "high": "High"
-                    }
-                },
-                "evidence": {
-                    "name": "evidence_link",
-                    "description": "Evidence of the action done by the user"
-                }
-            },
-            "remove": {
-                "name": "remove",
-                "description": "Remove a user of the blacklist",
-                "user": {
-                    "name": "user",
-                    "description": "User to unblacklist"
-                }
-            },
-            "check": {
-                "name": "check",
-                "description": "Check if a user is blacklisted",
-                "user": {
-                    "name": "user",
-                    "description": "User to target"
-                }
-            },
-            "suggest": {
-                "name": "suggest",
-                "description": "Suggest a user to be blacklisted",
-                "user": {
-                    "name": "user",
-                    "description": "User to suggest addition to the blacklist"
-                },
-                "reason": {
-                    "name": "reason",
-                    "description": "Reason for the blacklist suggestion"
-                },
-                "evidence": {
-                    "name": "evidence_image",
-                    "description": "Evidence of the action done by the user"
-                }
-            }
-        },
-        "message": {
-            "embed": {
-                "log": {
-                    "user": "User",
-                    "reason": "Reason",
-                    "mod": "Moderator"
-                },
-                "options": {
-                    "default": {
-                        "userTag": "Name",
-                        "userId": "ID",
-                        "reason": "Reason",
-                        "staffTag": "Staff Name",
-                        "staffId": "Staff ID",
-                        "evidence": "Evidence"
-                    },
-                    "noEvidence": "No evidence were found",
-                    "isBlacklisted": "This user is already blacklisted",
-                    "isNotBlacklisted": "This user isn't blacklisted",
-                    "youreNotBlacklisted": "You are not blacklisted"
-                }
-            },
-            "onWho": {
-                "isThemself": "Une erreur s'est produite. You can't blacklist yourself",
-                "isCheryl": "Une erreur s'est produite. You can't blacklist me",
-                "isOwner": "Une erreur s'est produite. You can't blacklist the owner",
-                "isStaff": "Une erreur s'est produite. You can't blacklist this user, because they're a staff of Cheryl",
-                "isBlacklisted": "Une erreur s'est produite. You can't blacklist this user, since they are blacklisted already"
-            },
-            "success": {
-                "blacklisted": "has been blacklisted"
-            }
-        },
-        "permission": {
-            "server": ":warning: Insufficient Permission - You need the following permission: *Whitelist Blacklist : For Server*",
-            "user": ":warning: Insufficient Permission - You need the following permission: *Whitelist Blacklist : For User*"
-        }
-    },
-    "ticket": {
-        "default": {
-            "name": "ticket",
-            "description": "Ticket System - Moderate your server easily with tickets"
-        }
-    },
-    "report": {
-        "default": {
-            "name": "report",
-            "description": "Report a member to the staff of the server"
-        }
-    },
-    "settings": {
-        "default": {
-            "name": "settings",
-            "description": "Change your server settings",
+    "context": {
+        "verify": {
             "setup": {
-                "name": "setup",
-                "description": "Setup a command",
-                "report_system": {
-                    "name": "report",
-                    "description": "Change the settings of the Report System",
-                    "channel": {
-                        "name": "channel",
-                        "description": "Channel to send the report"
+                "name": "Verify",
+                "description": "Manually verify the age of a member."
+            },
+            "response": {
+                "alreadyVerified": "%Arg% is already verified.",
+                "processVerify": "Currently trying to verify %Arg%",
+                "reason": "User verified by %Arg%.",
+                "verifiedComplete": "You successfully verified %Arg%.",
+                "newVerification": "%Arg% just got verified! Please make him feel welcomed~"
+            }
+        }
+    },
+    "commands": {
+        "action": {
+            "setup": {
+                "name": "action",
+                "description": "Do an action (or suggest an image for an action) on a member.",
+                "string": {
+                    "choice": {
+                        "name": "choice",
+                        "description": "What action would you like to do?"
                     },
-                    "staffRole": {
-                        "name": "staffrole",
-                        "description": "Role to ping when a report is received"
+                    "suggest": {
+                        "name": "suggest",
+                        "description": "Suggest an image to be added to the selected choice."
                     }
                 },
-                "welcome_system": {
-                    "name": "welcome",
-                    "description": "Change the settings of the Welcome System",
-                    "channel": {
-                        "name": "channel",
-                        "description": "Channel to send the welcome message"
-                    },
-                    "autorole": {
-                        "name": "auto-role",
-                        "description": "Role to automatically give when a user join"
-                    }
-                },
-                "blacklist_system": {
-                    "name": "blacklist",
-                    "description": "Change the settings of the Blacklist System",
-                    "status": {
-                        "name": "status",
-                        "description": "enable/disable"
-                    },
-                    "channel": {
-                        "name": "channel",
-                        "description": "Channel to send the alert"
-                    },
-                    "autoban": {
-                        "name": "auto-ban",
-                        "description": "enable/disable"
-                    }
-                },
-                "action_system": {
-                    "name": "action",
-                    "description": "Change the settings of the command: Action",
-                    "options": {
-                        "name": "options",
-                        "description": "Select a feature that you wish to disable/enable"
-                    },
-                    "status": {
-                        "name": "status",
-                        "description": "enable/disable"
-                    }
-                },
-                "verification_system": {
-                    "name": "verification",
-                    "description": "Change the settings of the Verification System",
-                    "command": {
-                        "name": "command",
-                        "description": "Change the settings of the command: Verify",
-                        "channel": {
-                            "name": "welcomechannel",
-                            "description": "Channel to send the welcome message"
-                        },
-                        "staffRole": {
-                            "name": "staffrole",
-                            "description": "Role that can verify members"
-                        },
-                        "addRole": {
-                            "name": "addrole",
-                            "description": "Role to add to the member"
-                        },
-                        "removeRole": {
-                            "name": "removerole",
-                            "description": "Role to remove to the member"
-                        }
-                    },
-                    "menu": {
-                        "name": "menu",
-                        "description": "Change the settings of the menu: Verify",
-                        "channel": {
-                            "name": "welcomechannel",
-                            "description": "Channel to send the welcome message"
-                        },
-                        "receiveChannel": {
-                            "name": "receivechannel",
-                            "description": "Channel to send the verification"
-                        },
-                        "staffRole": {
-                            "name": "staffrole",
-                            "description": "Role that can verify members"
-                        },
-                        "addRole": {
-                            "name": "addrole",
-                            "description": "Role to add to the member"
-                        },
-                        "removeRole": {
-                            "name": "removerole",
-                            "description": "Role to remove to the member"
-                        }
-                    }
-                },
-                "logging_system": {
-                    "name": "logging",
-                    "description": "Modifier les paramètres du système de journalisation",
-                    "options": {
-                        "name": "options",
-                        "description": "Changer le canal de journal d'un certain événement."
-                    },
-                    "channel": {
-                        "name": "canal",
-                        "description": "Vers quel canal dois-je envoyer le journal?"
-                    }
+                "user": {
+                    "name": "member",
+                    "description": "Member to target the action towards to."
                 }
+            },
+            "response": {
+                "suggest": {
+                    "wrongUrl": "You must provide a valid URL.",
+                    "wrongFormat": "You must send a valid format. The URL must end with `.jpg`, `.png` or `.gif`.",
+                    "alreadyExist": "This image has already been suggested/added.",
+                    "success": "Your image has been successfully sent to the staff of Cheryl."
+                },
+                "user": {
+                    "disable": "This command has been disabled in this server.",
+                    "notNsfw": "You cannot use NSFW command into this channel. This channel must be age-restricted to use this command."
+                },
+                "noImageFound": "There is no image in the database for the following category: %Arg%\n\nThe developers have been alerted!"
+            }
+        },
+        "profile": {
+            "setup": {
+                "name": "profile",
+                "description": "Get information about a user.",
+                "user": {
+                    "name": "user",
+                    "description": "User from whom to obtain information."
+                }
+            },
+            "response": {
+                "description": "Profile updated",
+                "fields": {
+                    "name": "Name",
+                    "id": "ID",
+                    "ageVerified": "Age Verified",
+                    "createdAt": "Account created on",
+                    "joinedAt": "Joined Discord on",
+                    "roles": "Roles"
+                }
+            }
+        },
+        "staff": {
+            "setup": {
+                "name": "staff",
+                "description": "Verify if a user is part of the staff of the bot.",
+                "user": {
+                    "name": "user",
+                    "description": "User to check."
+                }
+            }
+        },
+        "help": {
+            "setup": {
+                "name": "help",
+                "description": "Display the commands available (or information about a certain command)."
+            },
+            "response": {
+                "description": "The list of command is available on https://cheryl-bot.ca/commands.\n\nThere will also be a dashboard there in the future where users may adjust and personalize the bot."
+            }
+        },
+        "avatar": {
+            "setup": {
+                "name": "avatar",
+                "description": "Get the avatar of a user.",
+                "user": {
+                    "name": "user",
+                    "description": "User to get the avatar."
+                }
+            },
+            "response": {
+                "title": "Avatar of %Arg%"
+            }
+        },
+        "repeat": {
+            "setup": {
+                "name": "repeat",
+                "description": "Repeat the message you wish in the VC you are in.",
+                "string": {
+                    "name": "text",
+                    "description": "The text you wish the bot to repeat for you."
+                }
+            },
+            "error": {
+                "wrongGuild": "You must run the command on the guild you are a VC in."
+            }
+        },
+        "level": {
+            "setup": {
+                "name": "level",
+                "description": "Show your current progress and level.",
+                "user": {
+                    "name": "user",
+                    "description": "User to show the level."
+                }
+            }
+        },
+        "leaderboard": {
+            "setup": {
+                "name": "leaderboard",
+                "description": "Show the leaderboard of the server."
+            },
+            "response": {
+                "title": "Leaderboard of %Arg%",
+                "description": "The full leaderboard is available [here](https://cheryl-bot.ca/leaderboard/guild?id=%Arg%)",
+                "noLevel": "There is currently nobody with level."
+            }
+        },
+        "ticket": {
+            "setup": {
+                "name": "ticket",
+                "description": "Send the ticket template."
+            }
+        }
+    },
+    "events": {
+        "bump": {
+            "response": {
+                "timersUp": "Thank you for bumping the server! I will remind %Arg% in 2 hours to bump it again.",
+                "newTimer": {
+                    "title": "Bump Time",
+                    "description": "It's been 2 hours already and it's now time to bump the server!\n* Use the command `/bump` from Disboard."
+                }
+            }
+        },
+        "guildMemberAdd": {
+            "response": {
+                "onJoin": "%Arg% joined the server."
+            }
+        },
+        "guildMemberRemove": {
+            "response": {
+                "onLeave": "%Arg% left the server."
+            }
+        },
+        "guildBanAdd": {
+            "auditLog": {
+                "blacklist": "Blacklist | Auto-Ban"
             }
         }
     },

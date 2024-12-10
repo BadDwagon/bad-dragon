@@ -8,7 +8,7 @@ module.exports = {
         const request = await db.getConnection();
 
         //
-        //
+        // Send a message in the leaving channel mentionned.
         const loggingFind = await request.query(
             `SELECT * FROM loggings WHERE guildId=?`,
             [leavingMember.guild.id]
@@ -28,7 +28,7 @@ module.exports = {
                 if (!leavingMember.guild.members.me.permissionsIn(channelId_Leaving).has(['SendMessages', 'ViewChannel']) | leavingMember.user.bot) return;
 
                 await leavingChannel.send({
-                    content: [`${leavingMember.user.toString()} left the server.`]
+                    content: `${leavingMember.user.toString()} left the server.`
                 });
             }
         }
@@ -41,11 +41,7 @@ module.exports = {
         )
 
         if (ticketFind[0][0] != undefined) {
-            // This is currently only deleting one message and one channel. Will need to later, fix this to delete all the channels found.
-
-            for (i = 0; i < 10; i++) {
-                if (i >= 10) break;
-
+            for (i = 0; i <= 10; i++) {
                 //
                 // Delete the message of the ticket.
                 const msg = leavingMember.guild.channels.cache.get(leavingMember.guild.id).messages(ticketFind[0][i]['messageId']);

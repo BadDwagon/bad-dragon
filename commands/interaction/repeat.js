@@ -7,72 +7,84 @@ const player = new AudioPlayer();
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName(en.repeat.default.name)
+        .setName(en.commands.repeat.setup.name)
         .setNameLocalizations({
-            "fr": fr.repeat.default.name,
-            "de": de.repeat.default.name,
-            "es-ES": sp.repeat.default.name,
-            "nl": nl.repeat.default.name
+            "fr": fr.commands.repeat.setup.name,
+            "de": de.commands.repeat.setup.name,
+            "es-ES": sp.commands.repeat.setup.name,
+            "nl": nl.commands.repeat.setup.name
         })
-        .setDescription(en.repeat.default.description)
+        .setDescription(en.commands.repeat.setup.description)
         .setDescriptionLocalizations({
-            "fr": fr.repeat.default.description,
-            "de": de.repeat.default.description,
-            "es-ES": sp.repeat.default.description,
-            "nl": nl.repeat.default.description
+            "fr": fr.commands.repeat.setup.description,
+            "de": de.commands.repeat.setup.description,
+            "es-ES": sp.commands.repeat.setup.description,
+            "nl": nl.commands.repeat.setup.description
         })
         .addStringOption(option => option
-            .setName(en.repeat.default.string.name)
+            .setName(en.commands.repeat.setup.string.name)
             .setNameLocalizations({
-                "fr": fr.repeat.default.string.name,
-                "de": de.repeat.default.string.name,
-                "es-ES": sp.repeat.default.string.name,
-                "nl": nl.repeat.default.string.name
+                "fr": fr.commands.repeat.setup.string.name,
+                "de": de.commands.repeat.setup.string.name,
+                "es-ES": sp.commands.repeat.setup.string.name,
+                "nl": nl.commands.repeat.setup.string.name
             })
-            .setDescription(en.repeat.default.string.description)
+            .setDescription(en.commands.repeat.setup.description)
             .setDescriptionLocalizations({
-                "fr": fr.repeat.default.string.description,
-                "de": de.repeat.default.string.description,
-                "es-ES": sp.repeat.default.string.description,
-                "nl": nl.repeat.default.string.description
+                "fr": fr.commands.repeat.setup.string.description,
+                "de": de.commands.repeat.setup.string.description,
+                "es-ES": sp.commands.repeat.setup.string.description,
+                "nl": nl.commands.repeat.setup.string.description
             })
             .setRequired(false)),
     execute: async (interaction) => {
-        const textOption = interaction.options.getString(en.repeat.default.string.name)
-        // Find the voice channel in the server
-        if (!interaction.guild.channels.cache.find(channel => channel.id === interaction.member.voice.channel.id)) {
-            return interaction.reply({
-                content: en.repeat.error.wrongGuild,
+        const request = await db.getConnection();
+
+        const loggingsFind = await request.query(
+            `SELECT * FROM loggings WHERE guildId=?`,
+            [interaction.guild.id]
+        );
+
+        if (loggingsFind[0][0] != undefined) {
+            const language = loggingsFind[0][0]['language'];
+            const textOption = interaction.options.getString(en.commands.repeat.setup.string.name)
+            // Find the voice channel in the server
+            if (!interaction.guild.channels.cache.find(channel => channel.id === interaction.member.voice.channel.id)) {
+                return interaction.reply({
+                    content: language.commands.repeat.error.wrongGuild,
+                });
+            };
+
+            // Ready the player for audio
+            const audio = tts.getVoiceStream(textOption)
+            const audioResource = createAudioResource(audio, {
+                inputType: StreamType.Arbitrary,
+                inlineVolume: true
+            });
+
+            const connection = joinVoiceChannel({
+                channelId: interaction.member.voice.channel.id,
+                guildId: interaction.guild.id,
+                adapterCreator: interaction.member.voice.guild.voiceAdapterCreator,
+            });
+
+            const subscription = connection.subscribe(player);
+
+            // subscription could be undefined if the connection is destroyed!
+            if (subscription) {
+                // Unsubscribe after 5 seconds (stop playing audio on the voice connection)
+                setTimeout(() => subscription.unsubscribe(), 5000);
+            }
+
+            player.play(audioResource);
+
+            await interaction.reply({
+                content: `>>> ${textOption}`
             })
-        }
 
-        // Ready the player for audio
-        const audio = tts.getVoiceStream(textOption)
-        const audioResource = createAudioResource(audio, {
-            inputType: StreamType.Arbitrary,
-            inlineVolume: true
-        });
+            return setTimeout(() => connection.destroy(), 15000);
+        };
 
-        const connection = joinVoiceChannel({
-            channelId: interaction.member.voice.channel.id,
-            guildId: interaction.guild.id,
-            adapterCreator: interaction.member.voice.guild.voiceAdapterCreator,
-        });
-
-        const subscription = connection.subscribe(player);
-
-        // subscription could be undefined if the connection is destroyed!
-        if (subscription) {
-            // Unsubscribe after 5 seconds (stop playing audio on the voice connection)
-            setTimeout(() => subscription.unsubscribe(), 5000);
-        }
-
-        player.play(audioResource);
-
-        await interaction.reply({
-            content: `>>> ${textOption}`
-        })
-
-        return setTimeout(() => connection.destroy(), 15000);
+        return db.releaseConnection(request);
     }
-}
+};

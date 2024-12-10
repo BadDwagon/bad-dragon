@@ -1,4 +1,4 @@
-const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const { AttachmentBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const { en, fr, de, sp, nl } = require('../../preset/language');
@@ -8,40 +8,40 @@ const { db } = require('../../server');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName(en.level.default.name)
+        .setName(en.commands.level.setup.name)
         .setNameLocalizations({
-            "fr": fr.level.default.name,
-            "de": de.level.default.name,
-            "es-ES": sp.level.default.name,
-            "nl": nl.level.default.name
+            "fr": fr.commands.level.setup.name,
+            "de": de.commands.level.setup.name,
+            "es-ES": sp.commands.level.setup.name,
+            "nl": nl.commands.level.setup.name
         })
-        .setDescription(en.level.default.description)
+        .setDescription(en.commands.level.setup.description)
         .setDescriptionLocalizations({
-            "fr": fr.level.default.description,
-            "de": de.level.default.description,
-            "es-ES": sp.level.default.description,
-            "nl": nl.level.default.description
+            "fr": fr.commands.level.setup.description,
+            "de": de.commands.level.setup.description,
+            "es-ES": sp.commands.level.setup.description,
+            "nl": nl.commands.level.setup.description
         })
         .addUserOption(option => option
-            .setName(en.level.default.user.name)
+            .setName(en.commands.level.setup.user.name)
             .setNameLocalizations({
-                "fr": fr.level.default.user.name,
-                "de": de.level.default.user.name,
-                "es-ES": sp.level.default.user.name,
-                "nl": nl.level.default.user.name
+                "fr": fr.commands.level.setup.user.name,
+                "de": de.commands.level.setup.user.name,
+                "es-ES": sp.commands.level.setup.user.name,
+                "nl": nl.commands.level.setup.user.name
             })
-            .setDescription(en.level.default.user.description)
+            .setDescription(en.commands.level.setup.user.description)
             .setDescriptionLocalizations({
-                "fr": fr.level.default.user.description,
-                "de": de.level.default.user.description,
-                "es-ES": sp.level.default.user.description,
-                "nl": nl.level.default.user.description
+                "fr": fr.commands.level.setup.user.description,
+                "de": de.commands.level.setup.user.description,
+                "es-ES": sp.commands.level.setup.user.description,
+                "nl": nl.commands.level.setup.user.description
             })
             .setRequired(false)),
     execute: async (interaction) => {
         const request = await db.getConnection()
 
-        const user = interaction.options.getUser(en.staff.default.user.name);
+        const user = interaction.options.getUser(en.commands.staff.setup.user.name);
         const userCheck = user ?
             user :
             interaction.user;
@@ -49,6 +49,7 @@ module.exports = {
         const avatar = await loadImage(userCheck.displayAvatarURL({ extension: 'png' }));
         GlobalFonts.registerFromPath('./ressources/font/Poppins-SemiBold.ttf', 'Poppins')
 
+        //
         // Create the levelup picture
         const canvas = createCanvas(700, 250);
         const context = canvas.getContext('2d');
@@ -68,13 +69,11 @@ module.exports = {
             xpText = Math.floor((levelFind[0][0]['xp'] * 100) / levelFind[0][0]['xpNext']);
         }
 
-
         context.font = '60px Poppins';
         context.fillStyle = '#00af00';
         context.fillText(levelCurrent.toString(), canvas.width / 1.575, canvas.height / 2)
 
         context.fillStyle = '#ffffff';
-        // 1.8 is center for height
         context.fillText('Level', canvas.width / 2.5, canvas.height / 2)
 
         context.lineWidth = 12;

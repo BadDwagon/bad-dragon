@@ -7,136 +7,96 @@ const { db } = require('../../server');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName(en.profile.default.name)
+        .setName(en.commands.profile.setup.name)
         .setNameLocalizations({
-            "fr": fr.profile.default.name,
-            "de": de.profile.default.name,
-            "es-ES": sp.profile.default.name,
-            "nl": nl.profile.default.name
+            "fr": fr.commands.profile.setup.name,
+            "de": de.commands.profile.setup.name,
+            "es-ES": sp.commands.profile.setup.name,
+            "nl": nl.commands.profile.setup.name
         })
-        .setDescription(en.profile.default.description)
+        .setDescription(en.commands.profile.setup.description)
         .setDescriptionLocalizations({
-            "fr": fr.profile.default.description,
-            "de": de.profile.default.description,
-            "es-ES": sp.profile.default.description,
-            "nl": nl.profile.default.description
+            "fr": fr.commands.profile.setup.description,
+            "de": de.commands.profile.setup.description,
+            "es-ES": sp.commands.profile.setup.description,
+            "nl": nl.commands.profile.setup.description
         })
         .addUserOption(option => option
-            .setName(en.profile.default.user.name)
+            .setName(en.commands.profile.setup.user.name)
             .setNameLocalizations({
-                "fr": fr.profile.default.user.name,
-                "de": de.profile.default.user.name,
-                "es-ES": sp.profile.default.user.name,
-                "nl": nl.profile.default.user.name
+                "fr": fr.commands.profile.setup.user.name,
+                "de": de.commands.profile.setup.user.name,
+                "es-ES": sp.commands.profile.setup.user.name,
+                "nl": nl.commands.profile.setup.user.name
             })
-            .setDescription(en.profile.default.user.description)
+            .setDescription(en.commands.profile.setup.user.description)
             .setDescriptionLocalizations({
-                "fr": fr.profile.default.user.description,
-                "de": de.profile.default.user.description,
-                "es-ES": sp.profile.default.user.description,
-                "nl": nl.profile.default.user.description
+                "fr": fr.commands.profile.setup.user.description,
+                "de": de.commands.profile.setup.user.description,
+                "es-ES": sp.commands.profile.setup.user.description,
+                "nl": nl.commands.profile.setup.user.description
             })
-            .setRequired(false))
-        .addStringOption(option => option
-            .setName(en.profile.default.choice.age.name)
-            .setNameLocalizations({
-                "fr": fr.profile.default.choice.age.name,
-                "de": de.profile.default.choice.age.name,
-                "es-ES": sp.profile.default.choice.age.name,
-                "nl": nl.profile.default.choice.age.name
-            })
-            .setDescription(en.profile.default.choice.age.description)
-            .setDescriptionLocalizations({
-                "fr": fr.profile.default.choice.age.description,
-                "de": de.profile.default.choice.age.description,
-                "es-ES": sp.profile.default.choice.age.description,
-                "nl": nl.profile.default.choice.age.description
-            })
-            .addChoices(
-                { name: en.profile.default.choice.age.list.minor, value: "minor" },
-                { name: en.profile.default.choice.age.list.adult, value: "adult" },
-            )
             .setRequired(false)),
     execute: async (interaction) => {
-        const ageOptions = interaction.options.getString(en.profile.default.choice.age.name);
-        const user = interaction.options.getUser(en.profile.default.user.name);
-        const profileEmbed = new EmbedBuilder()
+        const request = await db.getConnection();
 
-        db.getConnection();
+        const loggingsFind = await request.query(
+            `SELECT * FROM loggings WHERE guildId=?`,
+            [interaction.guild.id]
+        );
 
-        // Change the variable user if it was mentionned or not, if not mentionned the target will be themselves.
-        user ?
-            userTarget = user :
-            userTarget = interaction.user;
+        if (loggingsFind[0][0] != undefined) {
+            //
+            // Change the variable user if it was mentionned or not, if not mentionned the target will be themselves.
+            const user = interaction.options.getUser(en.commands.profile.setup.user.name);
+            user ?
+                userTarget = user :
+                userTarget = interaction.user;
+            const member = interaction.guild.members.cache.get(userTarget.id) || await interaction.guild.members.fetch(userTarget.id).catch(error => { });
 
-        const profileData = await db.query(`SELECT * FROM profiles WHERE userId=?`,
-            [userTarget.id]);
-
-        if (profileData[0] == undefined) {
-            await db.query(`INSERT INTO profiles (userName, userId) VALUES (?, ?)`,
-                [userTarget.username, userTarget.id]);
-        };
-
-        if (ageOptions) {
-            profileEmbed.setDescription(en.profile.default.choice.message.option.embed.description);
-            profileEmbed.addFields(
-                { name: en.profile.default.choice.age, value: ageOptions, inline: true },
+            //
+            // Check if there is data from the users mentionned already in the users database.
+            const usersData = await request.query(
+                `SELECT * FROM users WHERE userId=?`,
+                [userTarget.id]
             );
 
-            await db.query(`UPDATE profiles SET (age=?) WHERE (?)`,
-                [ageOptions, interaction.user.id]);
-
-            return interaction.reply({
-                embeds: [optionEmbed],
-                ephemeral: true
-            });
-        } else {
-            // If no user mentionned return self
-            if (user) {
-                memberData = user;
-                userData = user.id;
-            } else {
-                memberData = interaction.member;
-                userData = interaction.user.id;
+            if (usersData[0][0] == undefined) {
+                await db.query(
+                    `INSERT INTO users (userName, userId) VALUES (?, ?)`,
+                    [userTarget.username, userTarget.id]
+                );
             };
 
-            const member = interaction.guild.members.cache.get(memberData.id) || await interaction.guild.members.fetch(memberData.id).catch(error => { });
+            usersData[0][0]['ageVerified'] == 1 ?
+                isAgeVerified = "Yes" :
+                isAgeVerified = "No";
 
-            // This code is very laggy, will need to be optimized
+            const embed = new EmbedBuilder()
+                .setThumbnail(userTarget.displayAvatarURL())
+                .setColor("Blue")
+                .addFields(
+                    { name: en.commands.profile.response.fields.name, value: userTarget.toString(), inline: true },
+                    { name: en.commands.profile.response.fields.id, value: "`" + userTarget.id + "`", inline: true },
+                    { name: en.commands.profile.response.fields.ageVerified, value: "`" + isAgeVerified + "`", inline: true },
+                );
 
-            profileEmbed.addFields(
-                { name: en.profile.default.choice.message.option.embed.name, value: memberData.toString(), inline: true },
-                { name: en.profile.default.choice.message.option.embed.id, value: "`" + memberData.id + "`", inline: true },
-                { name: '\u200b', value: '\u200b', inline: true },
-            )
-            profileEmbed.setThumbnail(memberData.displayAvatarURL())
-            profileEmbed.setColor("Blue");
-
-            profileData[0][0]['verified18'] === 1 ?
-                isVerified18 = "Yes" :
-                isVerified18 = "No";
-            profileEmbed.addFields(
-                { name: en.profile.default.choice.message.option.embed.age, value: "`" + profileData[0][0]['age'] + "`", inline: true },
-                { name: en.profile.default.choice.message.option.embed.verified18, value: "`" + isVerified18 + "`", inline: true },
-                { name: '\u200b', value: '\u200b', inline: true }
-            );
-
-            if (interaction.guild.members.cache.get(memberData.id)) {
+            if (interaction.guild.members.cache.get(userTarget.id)) {
                 roleMap = member.roles.cache
                     .filter((roles) => roles.id !== interaction.guild.id)
                     .sort((a, b) => b.position - a.position)
                     .map((role) => role.toLocaleString())
                     .join(", ");
-                profileEmbed.addFields(
-                    { name: en.profile.default.choice.message.option.embed.roles, value: roleMap },
+                embed.addFields(
+                    { name: en.commands.profile.response.fields.roles, value: roleMap },
                 );
             };
 
             await interaction.reply({
-                embeds: [profileEmbed],
+                embeds: [embed],
             });
-        }
+        };
 
-        return db.releaseConnection();
+        return db.releaseConnection(request);
     }
 };

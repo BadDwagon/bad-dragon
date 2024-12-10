@@ -1,45 +1,55 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { en, fr, de, sp, nl } = require('../../preset/language');
-const configPreset = require('../../config/main');
+const { en, fr, de, sp, nl } = require('../../preset/language.js');
+const configPreset = require('../../config/main.json');
+const { db } = require('../../server.js');
 
 // Display a list of command that the bot as.
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName(en.help.default.name)
+    .setName(en.commands.help.setup.name)
     .setNameLocalizations({
-      "fr": fr.help.default.name,
-      "de": de.help.default.name,
-      "es-ES": sp.help.default.name,
-      "nl": nl.help.default.name
+      "fr": fr.commands.help.setup.name,
+      "de": de.commands.help.setup.name,
+      "es-ES": sp.commands.help.setup.name,
+      "nl": nl.commands.help.setup.name
     })
-    .setDescription(en.help.default.description)
+    .setDescription(en.commands.help.setup.description)
     .setDescriptionLocalizations({
-      "fr": fr.help.default.description,
-      "de": de.help.default.description,
-      "es-ES": sp.help.default.description,
-      "nl": nl.help.default.description
+      "fr": fr.commands.help.setup.description,
+      "de": de.commands.help.setup.description,
+      "es-ES": sp.commands.help.setup.description,
+      "nl": nl.commands.help.setup.description
     }),
   execute: async (interaction) => {
-    const helpEmbed = new EmbedBuilder()
-      .setDescription(
-        "The list of command is available on https://cheryl-bot.ca/commands.\n\n" +
-        "There will also be a dashboard there in the future where users may adjust and personalize the bot."
-      )
-      .setColor("Blue")
+    const request = await db.getConnection();
 
-    const helpButton = new ActionRowBuilder()
-      .addComponents(
-        new ButtonBuilder()
-          .setLabel(en.default.button.discord)
-          .setURL(configPreset.other.discordLink)
-          .setStyle(ButtonStyle.Link),
-      );
+    const loggingsFind = await request.query(
+      `SELECT * FROM loggings WHERE guildId=?`,
+      [interaction.guild.id]
+    );
 
-    return interaction.reply({
-      embeds: [helpEmbed],
-      components: [helpButton],
-    });
+    if (loggingsFind[0][0] != undefined) {
+      //const language = loggingsFind[0][0]['language'];
+      const helpEmbed = new EmbedBuilder()
+        .setDescription(en.commands.help.response.description)
+        .setColor("Blue")
+
+      const helpButton = new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+            .setLabel(en.global.button.discord)
+            .setURL(configPreset.other.discordLink)
+            .setStyle(ButtonStyle.Link),
+        );
+
+      await interaction.reply({
+        embeds: [helpEmbed],
+        components: [helpButton],
+      });
+    }
+
+    return db.releaseConnection(request);
   }
 };

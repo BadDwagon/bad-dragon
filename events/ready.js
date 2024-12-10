@@ -18,17 +18,18 @@ module.exports = {
                 `SELECT COUNT(*) FROM blacklists`
             )
 
-            let status = [
+            const status = [
                 `${bot.guilds.cache.reduce((a, g) => a + g.memberCount, 0)} Members!`,
                 `${bot.guilds.cache.size} Servers!`,
                 `${blacklistFind[0][0]['COUNT(*)']} Blacklisted Users!`,
                 `Version ${configPreset.botInfo.version}`,
             ];
 
-            if (counter == status.length) counter = 0;
-            bot.user.setActivity(status[counter], { type: ActivityType.Watching });
+            counter == status.length ?
+                counter = 0 :
+                counter++;
 
-            counter++;
+            bot.user.setActivity(status[counter], { type: ActivityType.Watching });
 
             db.releaseConnection(request);
         }, 10000);

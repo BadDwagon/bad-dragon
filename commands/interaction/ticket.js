@@ -6,21 +6,25 @@ const { en, fr, de, sp, nl } = require('../../preset/language');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName(en.ticket.default.name)
+        .setName(en.commands.ticket.setup.name)
         .setNameLocalizations({
-            "fr": fr.ticket.default.name,
-            "de": de.ticket.default.name,
-            "es-ES": sp.ticket.default.name,
-            "nl": nl.ticket.default.name
+            "fr": fr.commands.ticket.setup.name,
+            "de": de.commands.ticket.setup.name,
+            "es-ES": sp.commands.ticket.setup.name,
+            "nl": nl.commands.ticket.setup.name
         })
-        .setDescription(en.ticket.default.description)
+        .setDescription(en.commands.ticket.setup.description)
         .setDescriptionLocalizations({
-            "fr": fr.ticket.default.description,
-            "de": de.ticket.default.description,
-            "es-ES": sp.ticket.default.description,
-            "nl": nl.ticket.default.description
+            "fr": fr.commands.ticket.setup.description,
+            "de": de.commands.ticket.setup.description,
+            "es-ES": sp.commands.ticket.setup.description,
+            "nl": nl.commands.ticket.setup.description
         }),
     execute: async (interaction) => {
+        await interaction.reply({
+            content: "Sending."
+        });
+
         const button = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
@@ -79,9 +83,9 @@ module.exports = {
             )
             .setColor('Blue')
 
-        interaction.channel.send({
+        return interaction.channel.send({
             embeds: [embed],
             components: [button]
-        })
+        });
     }
 };

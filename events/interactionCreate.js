@@ -1,6 +1,6 @@
 const { Events } = require('discord.js');
 const { en } = require('../preset/language')
-const { db } = require('../server');
+const { db, consoleDate } = require('../server');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -38,7 +38,7 @@ module.exports = {
             await command.execute(interaction);
         } catch (error) {
             console.error(
-                `${interaction.user.tag} (${interaction.user.id}) executed ${interaction.commandName}`,
+                `${consoleDate} ${interaction.user.tag} (${interaction.user.id}) executed ${interaction.commandName}\n\n`,
                 error
             )
         }

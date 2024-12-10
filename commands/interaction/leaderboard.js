@@ -1,62 +1,73 @@
-const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { en, fr, de, sp, nl } = require('../../preset/language');
-const { db } = require('../../server');
+const { en, fr, de, sp, nl } = require('../../preset/language.js');
+const { db } = require('../../server.js');
 
 // Show the leaderboard of the server.
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName(en.leaderboard.default.name)
+        .setName(en.commands.leaderboard.setup.name)
         .setNameLocalizations({
-            "fr": fr.leaderboard.default.name,
-            "de": de.leaderboard.default.name,
-            "es-ES": sp.leaderboard.default.name,
-            "nl": nl.leaderboard.default.name
+            "fr": fr.commands.leaderboard.setup.name,
+            "de": de.commands.leaderboard.setup.name,
+            "es-ES": sp.commands.leaderboard.setup.name,
+            "nl": nl.commands.leaderboard.setup.name
         })
-        .setDescription(en.leaderboard.default.description)
+        .setDescription(en.commands.leaderboard.setup.description)
         .setDescriptionLocalizations({
-            "fr": fr.leaderboard.default.description,
-            "de": de.leaderboard.default.description,
-            "es-ES": sp.leaderboard.default.description,
-            "nl": nl.leaderboard.default.description
+            "fr": fr.commands.leaderboard.setup.description,
+            "de": de.commands.leaderboard.setup.description,
+            "es-ES": sp.commands.leaderboard.setup.description,
+            "nl": nl.commands.leaderboard.setup.description
         }),
     execute: async (interaction) => {
-        const request = await db.getConnection()
+        const request = await db.getConnection();
 
-        const embed = new EmbedBuilder()
-            .setTitle(`Leaderboard of ${interaction.guild.name}`)
-            .setDescription(`The full leaderboard is available [here](https://cheryl-bot.ca/leaderboard/guild?id=${interaction.guild.id})`)
-            .setColor("Blue")
-
-        const levelFind = await request.query(
-            `SELECT * FROM level WHERE guildId=?`,
+        const loggingsFind = await request.query(
+            `SELECT * FROM loggings WHERE guildId=?`,
             [interaction.guild.id]
         );
 
-        if (levelFind[0][0] != undefined) {
-            const levelOrderFind = await request.query(
-                `SELECT * FROM level ORDER BY xp DESC LIMIT 9 OFFSET 0`
-            )
+        if (loggingsFind[0][0] != undefined) {
+            //const language = loggingsFind[0][0]['language'];
+            const titleReplace = en.commands.leaderboard.response.title;
+            const descriptionReplace = en.commands.leaderboard.response.description;
 
-            let i = 1;
+            const embed = new EmbedBuilder()
+                .setTitle(titleReplace.replace(/%Arg%/, interaction.guild.name))
+                .setDescription(descriptionReplace.replace(/%Arg%/, interaction.guild.id))
+                .setColor("Blue")
 
-            for (leaderboard of levelOrderFind[0]) {
-                embed.addFields(
-                    { name: `#${i}`, value: '<@' + leaderboard['userId'] + '> \n**Level** → `' + leaderboard['level'] + '` \n**XP** → `' + leaderboard['xp'] + '`', inline: true }
-                );
-                i++;
+            const levelFind = await request.query(
+                `SELECT * FROM level WHERE guildId=?`,
+                [interaction.guild.id]
+            );
+
+            if (levelFind[0][0] != undefined) {
+                const levelOrderFind = await request.query(
+                    `SELECT * FROM level ORDER BY xp DESC LIMIT 9 OFFSET 0`
+                )
+
+                let i = 1;
+
+                for (leaderboard of levelOrderFind[0]) {
+                    embed.addFields(
+                        { name: `#${i}`, value: '<@' + leaderboard['userId'] + '> \n**Level** → `' + leaderboard['level'] + '` \n**XP** → `' + leaderboard['xp'] + '`', inline: true }
+                    );
+                    i++;
+                };
+
+                await interaction.reply({
+                    embeds: [embed]
+                });
+            } else {
+                await interaction.reply({
+                    content: en.commands.leaderboard.response.noLevel,
+                    ephemeral: true,
+                });
             };
-
-            await interaction.reply({
-                embeds: [embed]
-            });
-        } else {
-            await interaction.reply({
-                content: "There is currently nobody with any level.",
-                ephemeral: true,
-            });
-        }
+        };
 
         return db.releaseConnection(request);
     }

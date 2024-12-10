@@ -6,12 +6,12 @@ const { db } = require('../../server');
 
 module.exports = {
     data: new ContextMenuCommandBuilder()
-        .setName(en.verify.default.name)
+        .setName(en.context.verify.setup.name)
         .setNameLocalizations({
-            "fr": fr.verify.default.name,
-            "de": de.verify.default.name,
-            "es-ES": sp.verify.default.name,
-            "nl": nl.verify.default.name
+            "fr": fr.context.verify.setup.name,
+            "de": de.context.verify.setup.name,
+            "es-ES": sp.context.verify.setup.name,
+            "nl": nl.context.verify.setup.name
         })
         .setType(ApplicationCommandType.User),
     execute: async (interaction) => {
@@ -21,60 +21,62 @@ module.exports = {
 
         //
         // Check for the permission of the user executing the command.
+        const missingRoleReply = en.global.userMissingRole;
         if (!interaction.member.roles.cache.some(role => role.id === '1191482864156557332')) {
             return interaction.reply({
-                content: "You do not have the permission to do that.",
+                content: missingRoleReply.replace(/%Arg%/, '<@&1191482864156557332>'),
                 ephemeral: true,
             });
-        }
-
-        //
-        // Check if the user is already verified.
-        if (interaction.targetMember.roles.cache.some(role => role.id === '1084970943820075050')) {
-            return interaction.reply({
-                content: `${interaction.targetMember.toString()} is already verified.`,
-                ephemeral: true,
-            });
-        }
-
-        //
-        // Check for the roles that the member has.
-        let reason = `User verified by ${interaction.user.tag}.`
-
-        if (!interaction.targetMember.roles.cache.some(role => role.id === '1084970943820075050')) {
-            await interaction.targetMember.roles.add(
-                '1084970943820075050',
-                reason
-            )
-        } else if (interaction.targetMember.roles.cache.some(role => role.id === '1233066501825892383')) {
-            await interaction.targetMember.roles.remove(
-                '1233066501825892383',
-                reason
-            )
-        }
+        };
 
         //
         // Replying to the staff.
+        const processVerify = en.context.verify.response.processVerify;
         await interaction.reply({
-            content: `Currently trying to verify ${interaction.targetMember.toString()}.`,
+            content: processVerify.replace(/%Arg%/, interaction.targetMember.toString()),
             ephemeral: true,
         });
 
         //
+        // Check if the user is already verified.
+        const reason = en.context.verify.response.reason;
+        const alreadyVerified = en.context.verify.response.alreadyVerified;
+        if (interaction.targetMember.roles.cache.some(role => role.id === '1084970943820075050')) {
+            return interaction.reply({
+                content: alreadyVerified.replace(/%Arg%/, interaction.targetMember.toString()),
+                ephemeral: true,
+            });
+        } else {
+            await interaction.targetMember.roles.add(
+                '1084970943820075050',
+                reason.replace(/%Arg%/, interaction.user.username)
+            );
+        };
+
+        //
+        // Remove the un-verified role.
+        if (interaction.targetMember.roles.cache.some(role => role.id === '1233066501825892383')) {
+            await interaction.targetMember.roles.remove(
+                '1233066501825892383',
+                reason.replace(/%Arg%/, interaction.user.username)
+            );
+        };
+
+        //
         // Updating the profile.
-        const profileFind = await request.query(
-            'SELECT userId FROM profiles WHERE userId=?',
+        const userFind = await request.query(
+            'SELECT userId FROM users WHERE userId=?',
             [interaction.targetId]
         )
 
-        if (profileFind[0][0] == undefined) {
+        if (userFind[0][0] == undefined) {
             await request.query(
-                'INSERT INTO profiles (userId, userName, verified18) VALUES (?, ?, ?)',
+                'INSERT INTO users (userId, userName, ageVerified) VALUES (?, ?, ?)',
                 [interaction.targetId, interaction.targetMember.username, 1]
             )
         } else {
             await request.query(
-                'UPDATE profiles SET verified18=? WHERE userId=?',
+                'UPDATE users SET ageVerified=? WHERE userId=?',
                 [1, interaction.targetId]
             )
         }
@@ -84,7 +86,7 @@ module.exports = {
         const verifiedEmbed = new EmbedBuilder()
             .addFields(
                 {
-                    name: 'Auto-Role',
+                    name: 'Reaction Role',
                     value:
                         'There is multiple roles you can grab, some are just for fun and some that gives you access to channels :\n' +
                         '* <#1082135082246078464>\n' +
@@ -96,15 +98,17 @@ module.exports = {
             .setColor('Blue')
 
         const channel18 = interaction.guild.channels.cache.get('1091220263569461349')
+        const newVerification = en.context.verify.response.newVerification;
         await channel18.send({
-            content: `${interaction.targetMember.toString()} just got verified! Please make him feel welcomed~`,
+            content: newVerification.replace(/%Arg%/, interaction.targetMember.toString()),
             embeds: [verifiedEmbed],
         });
 
         //
         // Modifying the reply to alert the staff it is done.
+        const verifiedComplete = en.context.verify.response.verifiedComplete;
         await interaction.deferReply({
-            content: `You successfully verified ${interaction.targetMember.toString()}'s age.`,
+            content: verifiedComplete.replace(/%Arg%/, interaction.targetMember.toString()),
             ephemeral: true,
         });
 

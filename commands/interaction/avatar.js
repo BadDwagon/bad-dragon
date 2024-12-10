@@ -1,52 +1,66 @@
 const { EmbedBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { en, fr, de, sp, nl } = require('../../preset/language');
+const { en, fr, de, sp, nl } = require('../../preset/language.js');
 
 // Display the selected user avatar.
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName(en.avatar.default.name)
+        .setName(en.commands.avatar.setup.name)
         .setNameLocalizations({
-            "fr": fr.avatar.default.name,
-            "de": de.avatar.default.name,
-            "es-ES": sp.avatar.default.name,
-            "nl": nl.avatar.default.name
+            "fr": fr.commands.avatar.setup.name,
+            "de": de.commands.avatar.setup.name,
+            "es-ES": sp.commands.avatar.setup.name,
+            "nl": nl.commands.avatar.setup.name
         })
-        .setDescription(en.avatar.default.description)
+        .setDescription(en.commands.avatar.setup.description)
         .setDescriptionLocalizations({
-            "fr": fr.avatar.default.description,
-            "de": de.avatar.default.description,
-            "es-ES": sp.avatar.default.description,
-            "nl": nl.avatar.default.description
+            "fr": fr.commands.avatar.setup.description,
+            "de": de.commands.avatar.setup.description,
+            "es-ES": sp.commands.avatar.setup.description,
+            "nl": nl.commands.avatar.setup.description
         })
         .addUserOption(option => option
-            .setName(en.avatar.default.user.name)
+            .setName(en.commands.avatar.setup.user.name)
             .setNameLocalizations({
-                "fr": fr.avatar.default.user.name,
-                "de": de.avatar.default.user.name,
-                "es-ES": sp.avatar.default.user.name,
-                "nl": nl.avatar.default.user.name
+                "fr": fr.commands.avatar.setup.user.name,
+                "de": de.commands.avatar.setup.user.name,
+                "es-ES": sp.commands.avatar.setup.user.name,
+                "nl": nl.commands.avatar.setup.user.name
             })
-            .setDescription(en.avatar.default.user.description)
+            .setDescription(en.commands.avatar.setup.user.description)
             .setDescriptionLocalizations({
-                "fr": fr.avatar.default.user.description,
-                "de": de.avatar.default.user.description,
-                "es-ES": sp.avatar.default.user.description,
-                "nl": nl.avatar.default.user.description
+                "fr": fr.commands.avatar.setup.user.description,
+                "de": de.commands.avatar.setup.user.description,
+                "es-ES": sp.commands.avatar.setup.user.description,
+                "nl": nl.commands.avatar.setup.user.description
             })
             .setRequired(false)),
     async execute(interaction) {
-        let userOption = interaction.options.getUser(en.avatar.default.user.name);
-        let member = userOption ? userOption : interaction.user;
+        const request = await db.getConnection();
 
-        let avatarEmbed = new EmbedBuilder()
-            .setTitle(`${en.avatar.message.embed.title} ${member.username}`)
-            .setImage(member.displayAvatarURL({ dynamic: true, size: 512 }))
-            .setColor('Blue')
+        const loggingsFind = await request.query(
+            `SELECT * FROM loggings WHERE guildId=?`,
+            [interaction.guild.id]
+        );
 
-        return interaction.reply({
-            embeds: [avatarEmbed]
-        });
+        if (loggingsFind[0][0] != undefined) {
+            //const language = loggingsFind[0][0]['language'];
+            const userOption = interaction.options.getUser(en.commands.avatar.setup.user.name);
+            const member = userOption ?
+                userOption :
+                interaction.user;
+
+            const avatarEmbed = new EmbedBuilder()
+                .setTitle(en.commands.avatar.response.title)
+                .setImage(member.displayAvatarURL({ dynamic: true, size: 512 }))
+                .setColor('Blue')
+
+            await interaction.reply({
+                embeds: [avatarEmbed]
+            });
+        }
+
+        return db.releaseConnection(request);
     }
 };

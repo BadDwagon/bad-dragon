@@ -6,8 +6,7 @@ module.exports = {
     name: Events.MessageCreate,
     once: false,
     execute: async (message) => {
-        if (message.guild.id !== '1082103667181764659') return;
-        if (message.author.bot) return;
+        if (message.guild.id !== '1082103667181764659' || message.author.bot) return;
 
         const request = await db.getConnection()
 
