@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { en, fr, de, sp, nl } = require('../../preset/language');
-const { bot } = require('../../server');
+const { bot, db } = require('../../server');
 const configPreset = require('../../config/main.json');
 
 // Display information about a user to know if they are a member of the staff of Cheryl or not.

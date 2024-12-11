@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { en, fr, de, sp, nl } = require('../../preset/language.js');
+const { db } = require('../../server.js');
 
 // Display the selected user avatar.
 
