@@ -622,8 +622,12 @@ bot.on('interactionCreate', async (interaction) => {
 
     switch (interaction.customId) {
       case 'ticket_delete':
-        console.log(ticketFind)
-        if (ticketFind[0][0] != undefined) await editMessageTicket(ticketFind, 'Completed', 'Green', 'You **completed** this ticket, it will be deleted in 3 seconds.')
+        if (ticketFind[0][0] != undefined) editMessageTicket(ticketFind, 'Completed', 'Green', false)
+
+        await interaction.reply({
+          content: 'You **completed** this ticket, it will be deleted in 3 seconds.',
+          ephemeral: true
+        });
 
         await request.query(
           `DELETE FROM ticket WHERE guildId=? AND channelId=?`,

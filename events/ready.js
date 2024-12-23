@@ -25,7 +25,7 @@ module.exports = {
                 `Version ${configPreset.botInfo.version}`,
             ];
 
-            counter == status.length ?
+            counter == 3 ?
                 counter = 0 :
                 counter++;
 

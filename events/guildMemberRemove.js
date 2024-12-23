@@ -33,44 +33,6 @@ module.exports = {
             }
         }
 
-        //
-        // Delete all tickets.
-        const ticketFind = await request.query(
-            `SELECT * FROM ticket WHERE userId=? AND guildId=?`,
-            [leavingMember.user.id, leavingMember.guild.id]
-        )
-
-        if (ticketFind[0][0] != undefined) {
-            for (i = 0; i <= 10; i++) {
-                //
-                // Delete the message of the ticket.
-                const msg = leavingMember.guild.channels.cache.get(leavingMember.guild.id).messages(ticketFind[0][i]['messageId']);
-                if (msg) msg.delete();
-
-                //
-                // Delete the ticket channel if there is one.
-                const channel = leavingMember.guild.channels.cache.get(ticketFind[0][i]['channelId']);
-                if (channel) channel.delete();
-            }
-
-            const ticketCountFind = await request.query(
-                `SELECT * FROM ticket_count WHERE guildId=?`,
-                [leavingMember.guild.id]
-            );
-
-            if (ticketCountFind[0][0] != undefined) {
-                await request.query(
-                    `UPDATE ticket SET count=? WHERE guildId=?`,
-                    [ticketCountFind[0][0]['count'] - 1, leavingMember.guild.id]
-                );
-            }
-
-            await request.query(
-                `DELETE FROM ticket WHERE guildId=? AND userId=?`,
-                [leavingMember.guild.id, leavingMember.user.id]
-            );
-        }
-
         return db.releaseConnection(request);
     }
 };

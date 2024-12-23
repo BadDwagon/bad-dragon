@@ -5,12 +5,10 @@ module.exports = {
     name: Events.MessageCreate,
     once: false,
     execute: async (message) => {
-        if (message.embeds[0] == undefined) return;
-
         try {
             if (message.embeds[0].description.startsWith('Bump')) {
                 const member = message.interaction.user.toString();
-                const reply = en.events.bump.response.newTimer
+                const reply = en.events.bump.response.timersUp
                 await message.channel.send({
                     content: reply.replace(/%Arg%/, member)
                 });
