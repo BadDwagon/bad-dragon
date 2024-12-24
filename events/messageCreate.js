@@ -52,8 +52,8 @@ module.exports = {
             if (xpIncrease >= levelFind[0][0]['xpNext']) {
                 const levelCurrent = levelFind[0][0]['level'] + 1;
                 const xpCurrent = levelFind[0][0]['xp'];
-                const xpNext = xpCurrent + increaseValue;
                 let increaseValue = 250;
+                const xpNext = xpCurrent + increaseValue;
 
                 if (levelCurrent >= 9) {
                     increaseValue = increaseValue + (100 * levelCurrent.toString().slice(1));
