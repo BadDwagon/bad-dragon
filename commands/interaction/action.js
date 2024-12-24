@@ -285,7 +285,7 @@ module.exports = {
                             const pat = [
                                 `${userInteracter} rub ${userTarget} on the head!~`,
                                 `${userInteracter} mess ${userTarget} hair!~`,
-                                `${userInteracter} strokes ${userTarget} head, messing with ${adj_target} hair!~`
+                                `${userInteracter} strokes ${userTarget} head, messing with ${adj_interaction} hair!~`
                             ];
                             sentence = pat;
                             break;
@@ -305,14 +305,14 @@ module.exports = {
                         case ('fuckstraight'):
                             const fuckStraight = [
                                 `${userInteracter} fuck ${userTarget} pussy really hard~`,
-                                `${userInteracter} thrust into ${userTarget} back and forth into ${adj_target} pussy making ${noun_target} all wet~`,
+                                `${userInteracter} thrust into ${userTarget} back and forth into ${adj_interaction} pussy making ${noun_target} all wet~`,
                             ];
                             sentence = fuckStraight;
                             break;
                         case ('fuckgay'):
                             const fuckGay = [
-                                `${userInteracter} fuck ${userTarget} really hard into ${adj_target} ass~`,
-                                `${userInteracter} thrust into ${userTarget} back and forth into ${adj_target} ass~`,
+                                `${userInteracter} fuck ${userTarget} really hard into ${adj_interaction} ass~`,
+                                `${userInteracter} thrust into ${userTarget} back and forth into ${adj_interaction} ass~`,
                             ];
                             sentence = fuckGay;
                             break;
@@ -353,14 +353,14 @@ module.exports = {
                         case ('fillstraight'):
                             const fillStraight = [
                                 `${userInteracter} fills up ${userTarget}'s ass with ${adj_interaction} seed~`,
-                                `${userInteracter} pushes ${adj_target} dick deep inside ${userTarget}'s ass, filling it up with ${adj_interaction} juicy cum~`,
+                                `${userInteracter} pushes ${adj_interaction} dick deep inside ${userTarget}'s ass, filling it up with ${adj_interaction} juicy cum~`,
                             ];
                             sentence = fillStraight;
                             break;
                         case ('fillgay'):
                             const fillGay = [
                                 `${userInteracter} fills up ${userTarget}'s ass with ${adj_interaction} seed~`,
-                                `${userInteracter} pushes ${adj_target} dick deep inside ${userTarget}'s ass, filling it up with ${adj_interaction} juicy cum~`,
+                                `${userInteracter} pushes ${adj_interaction} dick deep inside ${userTarget}'s ass, filling it up with ${adj_interaction} juicy cum~`,
                             ];
                             sentence = fillGay;
                             break;
