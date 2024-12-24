@@ -143,7 +143,7 @@
             },
             "response": {
                 "title": "Leaderboard of %Arg%",
-                "description": "The full leaderboard is available [here](https://cheryl-bot.ca/leaderboard/guild?id=%Arg%)",
+                "description": "The full leaderboard is available [here](https://cheryl-bot.ca/leaderboard?guild=%Arg%)",
                 "noLevel": "There is currently nobody with level."
             }
         },
