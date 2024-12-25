@@ -440,16 +440,25 @@ bot.on('interactionCreate', async (interaction) => {
           permissionOverwrites: [
             {
               id: interaction.guild.id,
-              deny: [PermissionsBitField.Flags.ViewChannel],
+              deny: [
+                PermissionsBitField.Flags.ViewChannel
+              ],
             },
             {
               id: interaction.user.id,
-              allow: [PermissionsBitField.Flags.ViewChannel],
+              allow: [
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.SendMessages
+              ],
             },
             {
               id: ticketFind[0][0]['userId'],
               type: 1,
-              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.AttachFiles],
+              allow: [
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.AttachFiles,
+                PermissionsBitField.Flags.SendMessages
+              ],
             }
           ]
         });
@@ -566,7 +575,6 @@ bot.on('interactionCreate', async (interaction) => {
             .setStyle(ButtonStyle.Secondary)
             .setDisabled(true)
         )
-
 
         //
         // Send the ticket message in the channel.
