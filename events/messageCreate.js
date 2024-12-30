@@ -34,36 +34,34 @@ module.exports = {
 
         const xpPerMessage = 5;
 
+        //
+        // Check if the user that sent the message got levels already in the guild
+        // If they do, do other stuff.
         if (levelFind[0][0] == undefined) {
             await request.query(
                 'INSERT INTO level (`guildId`, `userId`, `xp`) VALUES (?, ?, ?)',
                 [message.guild.id, message.author.id, xpPerMessage]
             )
         } else {
-            const xpIncrease = levelFind[0][0]['xp'] + xpPerMessage;
+            const xpIncrease = levelFind[0][0]['xp'] + xpPerMessage; // Increase level
 
             await request.query(
                 'UPDATE level SET `xp`=? WHERE guildId=? AND userId=?',
                 [xpIncrease, message.guild.id, message.author.id]
             )
 
+            const levelXpFind = await request.query(
+                `SELECT * FROM level_xp`,
+            );
+
             //
             // Level up
-            if (xpIncrease >= levelFind[0][0]['xpNext']) {
+            if (xpIncrease >= levelXpFind[0][0]['xp']) {
                 const levelCurrent = levelFind[0][0]['level'] + 1;
-                const xpCurrent = levelFind[0][0]['xp'];
-                let increaseValue = 250;
-                const xpNext = xpCurrent + increaseValue;
-
-                if (levelCurrent >= 9) {
-                    increaseValue = increaseValue + (100 * levelCurrent.toString().slice(1));
-                } else if (levelCurrent >= 100) {
-                    increaseValue = increaseValue + (100 * levelCurrent.toString().slice(2));
-                }
 
                 await request.query(
-                    'UPDATE level SET `xpNext`=?, `level`=? WHERE guildId=? AND userId=?',
-                    [xpNext, levelCurrent, message.guild.id, message.author.id]
+                    'UPDATE level SET `level`=? WHERE guildId=? AND userId=?',
+                    [levelCurrent, message.guild.id, message.author.id]
                 )
 
                 if (message.guild.id === '1082103667181764659') {
