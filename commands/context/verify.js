@@ -104,14 +104,6 @@ module.exports = {
             embeds: [verifiedEmbed],
         });
 
-        //
-        // Modifying the reply to alert the staff it is done.
-        const verifiedComplete = en.context.verify.response.verifiedComplete;
-        await interaction.deferReply({
-            content: verifiedComplete.replace(/%Arg%/, interaction.targetMember.toString()),
-            ephemeral: true,
-        });
-
         return db.releaseConnection(request);
     }
 };
