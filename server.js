@@ -510,11 +510,15 @@ bot.on('interactionCreate', async (interaction) => {
             inTicketEmbed.addFields(
               {
                 name: "Requirement",
-                value: "1. Be 18 years or older\n* A valid government ID or driving license"
+                value: "1. Be 18 years or older\n* A valid government ID or driving license OR a VRChat account with 18+ badge"
               },
               {
-                name: "Instructions",
-                value: "1. Write on a piece of paper your username\n* Place your prefered governmental identification on top of the piece of paper\n* Take a picture and share it to us in this channel"
+                name: "Instructions for ID Verfication",
+                value: "1. Write on a piece of paper your username (`" + ticketFind[0][0]['userId'] + "`)\n* Place your prefered governmental identification on top of the piece of paper\n* Take a picture and share it to us in this channel\n\nDo not hide your expiry date (EXP), date of birth (DOB) and the province, state or country on top of the ID."
+              },
+              {
+                name: "Instructions for VRChat account",
+                value: "1. Send a link of your profile\n* Wait for a moderator to send you a friend request\n* Accept the friend request of the moderator"
               },
             )
 
