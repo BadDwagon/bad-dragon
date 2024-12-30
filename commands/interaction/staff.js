@@ -42,7 +42,7 @@ module.exports = {
         const request = await db.getConnection();
 
         const loggingsFind = await request.query(
-            `SELECT * FROM loggings WHERE guildId=?`,
+            `SELECT * FROM logging WHERE guildId=?`,
             [interaction.guild.id]
         );
 

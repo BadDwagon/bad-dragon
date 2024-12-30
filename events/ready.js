@@ -69,7 +69,7 @@ module.exports = {
             });
 
             await request.query(
-                `INSERT INTO loggings (guildId) VALUES (?)`,
+                `INSERT INTO logging (guildId) VALUES (?)`,
                 [guild.id]
             ).catch((error) => { })
         });

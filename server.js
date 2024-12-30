@@ -172,7 +172,7 @@ bot.on('interactionCreate', async (interaction) => {
   // Generating ticket button.
   async function ticketButton() {
     const loggingFind = await request.query(
-      `SELECT * FROM loggings WHERE guildId=?`,
+      `SELECT * FROM logging WHERE guildId=?`,
       [interaction.guild.id]
     )
 
@@ -295,7 +295,7 @@ bot.on('interactionCreate', async (interaction) => {
   // Function to edit the -> Ticket Database and Ticket Message
   async function editMessageTicket(ticket, status, color, replyStaff) {
     const loggingFind = await request.query(
-      `SELECT * FROM loggings WHERE guildId=?`,
+      `SELECT * FROM logging WHERE guildId=?`,
       [interaction.guild.id]
     )
 
@@ -389,7 +389,7 @@ bot.on('interactionCreate', async (interaction) => {
     //
     // Get the -> Logging Database -> Ready
     let loggingFind = await request.query(
-      `SELECT * FROM loggings WHERE guildId=?`,
+      `SELECT * FROM logging WHERE guildId=?`,
       [interaction.guild.id]
     );
 

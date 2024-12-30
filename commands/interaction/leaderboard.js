@@ -25,12 +25,11 @@ module.exports = {
         const request = await db.getConnection();
 
         const loggingsFind = await request.query(
-            `SELECT * FROM loggings WHERE guildId=?`,
+            `SELECT * FROM logging WHERE guildId=?`,
             [interaction.guild.id]
         );
 
         if (loggingsFind[0][0] != undefined) {
-            //const language = loggingsFind[0][0]['language'];
             const titleReplace = en.commands.leaderboard.response.title;
             const descriptionReplace = en.commands.leaderboard.response.description;
 
@@ -40,13 +39,13 @@ module.exports = {
                 .setColor("Blue")
 
             const levelFind = await request.query(
-                `SELECT * FROM level WHERE guildId=?`,
+                `SELECT * FROM level WHERE guildId=? ORDER BY level DESC`,
                 [interaction.guild.id]
             );
 
-            if (levelFind[0][0] != undefined) {
+            if (levelFind[0][0] != undefined && levelFind[0][0]['level'] > 1) {
                 const levelOrderFind = await request.query(
-                    `SELECT * FROM level ORDER BY xp DESC LIMIT 9 OFFSET 0 WHERE guildId=?`
+                    `SELECT * FROM level WHERE guildId=? ORDER BY xp DESC LIMIT 9 OFFSET 0`
                     [interaction.guild.id]
                 )
 

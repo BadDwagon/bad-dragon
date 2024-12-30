@@ -112,7 +112,7 @@ module.exports = {
         const request = await db.getConnection();
 
         const loggingsFind = await request.query(
-            `SELECT * FROM loggings WHERE guildId=?`,
+            `SELECT * FROM logging WHERE guildId=?`,
             [interaction.guild.id]
         );
 
@@ -375,7 +375,7 @@ module.exports = {
                     //
                     // Check what action have been removed image or message
                     const loggingsFind = await request.query(
-                        `SELECT action_status FROM loggings WHERE guildId=?`,
+                        `SELECT action_status FROM logging WHERE guildId=?`,
                         [interaction.guild.id]
                     );
 

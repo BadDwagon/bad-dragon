@@ -44,6 +44,7 @@ module.exports = {
             )
         } else {
             const xpIncrease = levelFind[0][0]['xp'] + xpPerMessage; // Increase level
+            const levelCurrent = levelFind[0][0]['level'] + 1;
 
             await request.query(
                 'UPDATE level SET `xp`=? WHERE guildId=? AND userId=?',
@@ -51,14 +52,13 @@ module.exports = {
             )
 
             const levelXpFind = await request.query(
-                `SELECT * FROM level_xp`,
+                `SELECT * FROM level_xp WHERE level=? AND xp=?`,
+                [levelCurrent, xpIncrease]
             );
 
             //
             // Level up
-            if (xpIncrease >= levelXpFind[0][0]['xp']) {
-                const levelCurrent = levelFind[0][0]['level'] + 1;
-
+            if (levelXpFind[0][0] != undefined) {
                 await request.query(
                     'UPDATE level SET `level`=? WHERE guildId=? AND userId=?',
                     [levelCurrent, message.guild.id, message.author.id]

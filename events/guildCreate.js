@@ -28,13 +28,13 @@ module.exports = {
 
         // Find logging data in database
         const loggingFind = await request.query(
-            `SELECT * FROM loggings WHERE guildId=?`,
+            `SELECT * FROM logging WHERE guildId=?`,
             [guild.id]
         )
 
         if (loggingFind[0][0] == undefined) {
             await request.query(
-                `INSERT INTO loggings (guildId) VALUES (?)`,
+                `INSERT INTO logging (guildId) VALUES (?)`,
                 [guild.id]
             )
         }

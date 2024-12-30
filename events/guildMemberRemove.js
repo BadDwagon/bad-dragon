@@ -10,7 +10,7 @@ module.exports = {
         //
         // Send a message in the leaving channel mentionned.
         const loggingFind = await request.query(
-            `SELECT * FROM loggings WHERE guildId=?`,
+            `SELECT * FROM logging WHERE guildId=?`,
             [leavingMember.guild.id]
         )
 
@@ -21,7 +21,7 @@ module.exports = {
             const leavingChannel = leavingMember.guild.channels.cache.get(channelId_Leaving);
             if (!leavingChannel) {
                 await request.query(
-                    `UPDATE loggings SET leaving_channelDestination=?`,
+                    `UPDATE logging SET leaving_channelDestination=?`,
                     [null]
                 )
             } else {

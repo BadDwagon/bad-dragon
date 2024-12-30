@@ -22,8 +22,31 @@ module.exports = {
             )
         }
 
+        interaction.options._hoistedOptions[0] != undefined ?
+            option = interaction.options._hoistedOptions[0]['value'] :
+            option = null;
+
+        const commandStatsFind = await request.query(
+            `SELECT * FROM command_stats WHERE name=? AND special_option=?`,
+            [interaction.commandName, option]
+        )
+
+        if (commandStatsFind[0][0] == undefined) {
+            await request.query(
+                `INSERT INTO command_stats (name, special_option, usage_count) VALUES (?, ?, ?)`,
+                [interaction.commandName, option, 1]
+            )
+        } else {
+            await request.query(
+                `UPDATE command_stats SET usage_count=?, special_option=? WHERE name=?`,
+                [commandStatsFind[0][0]['usage_count'] + 1, option, interaction.commandName]
+            )
+        }
+
         if (commandFind[0]['isOn'] == 0 || !interaction.guild) {
-            !interaction.guild ? refusingAction = en.default.serverOnly : refusingAction = en.default.commandDisabledGlobally;
+            !interaction.guild ?
+                refusingAction = en.global.serverOnly :
+                refusingAction = en.global.commandDisabledGlobally;
 
             return interaction.reply({
                 content: refusingAction,
