@@ -101,7 +101,7 @@ module.exports = {
 
                     const userSettingFind = await request.query(
                         `SELECT * FROM user_settings WHERE userId=?`,
-                        [interaction.user.id]
+                        [message.author.id]
                     );
 
                     if (userSettingFind[0][0] == undefined || userSettingFind[0][0]['level_rankup'] == 0) {
