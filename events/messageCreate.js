@@ -99,7 +99,12 @@ module.exports = {
                         }
                     }
 
-                    if (levelFind[0][0]['messageAnnounce'] == 1) {
+                    const userSettingFind = await request.query(
+                        `SELECT * FROM user_settings WHERE userId=?`,
+                        [interaction.user.id]
+                    );
+
+                    if (userSettingFind[0][0] == undefined || userSettingFind[0][0]['level_rankup'] == 0) {
                         message.channel.send({
                             content: `Congrats ${message.author.toString()}, you leveled up! :partying_face:`,
                             files: [attachment]

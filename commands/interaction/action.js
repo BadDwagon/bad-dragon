@@ -111,14 +111,37 @@ module.exports = {
 
         const request = await db.getConnection();
 
+        const userTarget = optionUser ?
+            optionUser :
+            bot.user;
+
+        const userSettingsFind = await request.query(
+            `SELECT * FROM user_settings WHERE userId=?`,
+            [userTarget.id]
+        );
+
+        if (userSettingsFind[0][0] != undefined) {
+            if (userSettingsFind[0][0]['action_enabled']) {
+                interaction.reply({
+                    content: 'This user disabled this command to be used on them.',
+                    ephemeral: true,
+                });
+            } else if (userSettingsFind[0][0]['action_nsfw']) {
+                interaction.reply({
+                    content: 'This user disabled NSFW actions to be used on them.',
+                    ephemeral: true,
+                });
+            }
+
+            return db.releaseConnection(request);
+        }
+
         const loggingsFind = await request.query(
             `SELECT * FROM logging WHERE guildId=?`,
             [interaction.guild.id]
         );
 
         if (loggingsFind[0][0] != undefined) {
-            //const language = loggingsFind[0][0]['language'];
-
             if (optionSuggest) {
                 //
                 // Check if the suggestion is an URL
@@ -232,9 +255,6 @@ module.exports = {
 
                 if (actionImageFind[0][0] != undefined) {
                     const userInteracter = interaction.user.toString();
-                    const userTarget = optionUser ?
-                        optionUser :
-                        bot.user;
                     const noun_target = "them";
                     const adj_interaction = "their";
 

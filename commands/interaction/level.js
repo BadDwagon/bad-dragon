@@ -59,14 +59,19 @@ module.exports = {
             [userCheck.id, interaction.guild.id]
         )
 
+        const levelUpFind = await request.query(
+            'SELECT * FROM level_xp WHERE level=?',
+            [levelFind[0][0]['level'] + 1]
+        )
+
         let levelCurrent = 0;
         let xpCanvas = 0;
         let xpText = 0;
 
         if (levelFind[0][0] != undefined) {
             levelCurrent = levelFind[0][0]['level'];
-            xpCanvas = Math.floor((levelFind[0][0]['xp'] * 300) / levelFind[0][0]['xpNext']);
-            xpText = Math.floor((levelFind[0][0]['xp'] * 100) / levelFind[0][0]['xpNext']);
+            xpCanvas = Math.floor((levelFind[0][0]['xp'] * 300) / levelUpFind[0][0]['xp']);
+            xpText = Math.floor((levelFind[0][0]['xp'] * 100) / levelUpFind[0][0]['xp']);
         }
 
         context.font = '60px Poppins';

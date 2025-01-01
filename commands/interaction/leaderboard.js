@@ -45,7 +45,7 @@ module.exports = {
 
             if (levelFind[0][0] != undefined && levelFind[0][0]['level'] > 1) {
                 const levelOrderFind = await request.query(
-                    `SELECT * FROM level WHERE guildId=? ORDER BY xp DESC LIMIT 9 OFFSET 0`
+                    `SELECT * FROM level WHERE guildId=? ORDER BY xp DESC LIMIT 9 OFFSET 0`,
                     [interaction.guild.id]
                 )
 
