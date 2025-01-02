@@ -396,10 +396,6 @@ bot.on('interactionCreate', async (interaction) => {
     switch (interaction.customId) {
       case 'ticket_accept':
         //
-        // Update the -> Ticket Database & Ticket Message.
-        editMessageTicket(ticketFind, 'Accepted', 'Yellow', 'You **accepted** this ticket, it is currently being created.');
-
-        //
         // Lookup for the server settings.
         const ticketLogFind = await request.query(
           `SELECT * FROM logging_ticket WHERE guildId=?`,
@@ -430,6 +426,10 @@ bot.on('interactionCreate', async (interaction) => {
 
           break;
         };
+
+        //
+        // Update the -> Ticket Database & Ticket Message.
+        editMessageTicket(ticketFind, 'Accepted', 'Yellow', 'You **accepted** this ticket, it is currently being created.');
 
         //
         // Creating the ticket channel.
