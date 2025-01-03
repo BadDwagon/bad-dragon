@@ -285,8 +285,8 @@ bot.on('interactionCreate', async (interaction) => {
       components: [newTicketButton]
     }).then(async (msg) => {
       await request.query(
-        `INSERT INTO ticket (guildId, userId, ticketId, reason, messageId) VALUES (?, ?, ?, ?, ?)`,
-        [interaction.guild.id, interaction.user.id, ticketCount, reason, msg.id]
+        `INSERT INTO ticket (guildId, userName, userId, ticketId, reason, messageId) VALUES (?, ?, ?, ?, ?, ?)`,
+        [interaction.guild.id, interaction.user.username, interaction.user.id, ticketCount, reason, msg.id]
       )
     })
   }
@@ -514,7 +514,7 @@ bot.on('interactionCreate', async (interaction) => {
               },
               {
                 name: "Instructions for ID Verfication",
-                value: "1. Write on a piece of paper your username (`" + ticketFind[0][0]['userId'] + "`)\n* Place your prefered governmental identification on top of the piece of paper\n* Take a picture and share it to us in this channel\n\nDo not hide your expiry date (EXP), date of birth (DOB) and the province, state or country on top of the ID."
+                value: "1. Write on a piece of paper your username (`" + ticketFind[0][0]['userName'] + "`)\n* Place your prefered governmental identification on top of the piece of paper\n* Take a picture and share it to us in this channel\n\nDo not hide your expiry date (EXP), date of birth (DOB) and the province, state or country on top of the ID."
               },
               {
                 name: "Instructions for VRChat account",
