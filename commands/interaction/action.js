@@ -121,12 +121,12 @@ module.exports = {
         );
 
         if (userSettingsFind[0][0] != undefined) {
-            if (userSettingsFind[0][0]['action_enabled']) {
+            if (userSettingsFind[0][0]['action_enabled'] == 0) {
                 interaction.reply({
                     content: 'This user disabled this command to be used on them.',
                     ephemeral: true,
                 });
-            } else if (userSettingsFind[0][0]['action_nsfw']) {
+            } else if (nsfwChoice.includes(interaction.customId) && userSettingsFind[0][0]['action_nsfw'] == 0) {
                 interaction.reply({
                     content: 'This user disabled NSFW actions to be used on them.',
                     ephemeral: true,

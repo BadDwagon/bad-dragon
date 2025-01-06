@@ -652,6 +652,8 @@ bot.on('interactionCreate', async (interaction) => {
 
         break;
       case 'ticket_verify':
+        console.log(ticketFind[0][0])
+
         //
         // Replying to the staff.
         await interaction.reply({

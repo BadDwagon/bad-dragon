@@ -106,7 +106,7 @@ module.exports = {
 
                     if (userSettingFind[0][0] == undefined || userSettingFind[0][0]['level_rankup'] == 0) {
                         message.channel.send({
-                            content: `Congrats ${message.author.toString()}, you leveled up! :partying_face:`,
+                            content: `Congrats ${message.author.toString()}, you leveled up! :partying_face:\n\n-# You do not want to receive this message when you level up? You can disable it on the website : https://cheryl-bot.ca/settings`,
                             files: [attachment]
                         })
                     }
