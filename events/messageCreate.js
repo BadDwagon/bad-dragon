@@ -6,9 +6,14 @@ module.exports = {
     name: Events.MessageCreate,
     once: false,
     execute: async (message) => {
-        if (message.author.bot) return;
-
         const request = await db.getConnection()
+
+        const userSettingFind = await request.query(
+            `SELECT * FROM user_settings WHERE userId=?`,
+            [message.author.id]
+        );
+
+        if (message.author.bot || userSettingFind[0][0] != undefined && userSettingFind[0][0]['data_messageContent'] == 0) db.releaseConnection(request);
 
         const levelFind = await request.query(
             'SELECT * FROM level WHERE userId=? AND guildId=?',
@@ -98,11 +103,6 @@ module.exports = {
                             await message.member.roles.add(perksFind[0][0]['roleId'])
                         }
                     }
-
-                    const userSettingFind = await request.query(
-                        `SELECT * FROM user_settings WHERE userId=?`,
-                        [message.author.id]
-                    );
 
                     if (userSettingFind[0][0] == undefined || userSettingFind[0][0]['level_rankup'] == 0) {
                         message.channel.send({
