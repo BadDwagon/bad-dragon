@@ -13,7 +13,7 @@ module.exports = {
             [message.author.id]
         );
 
-        if (message.author.bot || userSettingFind[0][0] != undefined && userSettingFind[0][0]['data_messageContent'] == 0) db.releaseConnection(request);
+        if (message.author.bot || (userSettingFind[0][0] != undefined && userSettingFind[0][0]['data_messageContent'] == 0)) db.releaseConnection(request);
 
         const levelFind = await request.query(
             'SELECT * FROM level WHERE userId=? AND guildId=?',
