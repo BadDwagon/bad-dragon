@@ -13,12 +13,22 @@ module.exports = {
             [message.author.id]
         );
 
-        if (message.author.bot || (userSettingFind[0][0] != undefined && userSettingFind[0][0]['data_messageContent'] == 0)) db.releaseConnection(request);
+        // Look if the person refuses to get their data looked over.
+        if (userSettingFind[0][0] != undefined && userSettingFind[0][0]['data_messageContent'] == 0) return db.releaseConnection(request);
 
         const levelFind = await request.query(
             'SELECT * FROM level WHERE userId=? AND guildId=?',
             [message.author.id, message.guild.id]
         )
+
+        if (message.author.bot && levelFind[0][0] != undefined) {
+            await request.query(
+                'DELETE FROM level WHERE userId=?',
+                [message.author.id]
+            )
+
+            return db.releaseConnection(request);
+        } else if (message.author.bot) return db.releaseConnection(request);;
 
         const userFind = await request.query(
             'SELECT * FROM users WHERE userId=?',
